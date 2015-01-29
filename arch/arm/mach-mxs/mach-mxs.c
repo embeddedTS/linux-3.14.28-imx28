@@ -433,17 +433,14 @@ static void __init mxs_machine_init(void)
 	struct soc_device *soc_dev;
 	struct soc_device_attribute *soc_dev_attr;
 	int ret;
-printk("%s %d\n", __func__, __LINE__);
 	soc_dev_attr = kzalloc(sizeof(*soc_dev_attr), GFP_KERNEL);
 	if (!soc_dev_attr)
 		return;
-printk("%s %d\n", __func__, __LINE__);
 
 	root = of_find_node_by_path("/");
 	ret = of_property_read_string(root, "model", &soc_dev_attr->machine);
 	if (ret)
 		return;
-printk("%s %d\n", __func__, __LINE__);
 
 	soc_dev_attr->family = "Freescale MXS Family";
 	soc_dev_attr->soc_id = mxs_get_soc_id();
@@ -453,11 +450,8 @@ printk("%s %d\n", __func__, __LINE__);
 	if (IS_ERR(soc_dev)) {
 		kfree(soc_dev_attr->revision);
 		kfree(soc_dev_attr);
-printk("%s %d\n", __func__, __LINE__);
-
 		return;
 	}
-printk("%s %d\n", __func__, __LINE__);
 
 	parent = soc_device_to_device(soc_dev);
 
@@ -479,9 +473,6 @@ printk("%s %d\n", __func__, __LINE__);
 
 	if (of_machine_is_compatible("karo,tx28"))
 		tx28_post_init();
-	
-	printk("%s %d\n", __func__, __LINE__);
-	
 }
 
 #define MXS_CLKCTRL_RESET_CHIP		(1 << 1)
