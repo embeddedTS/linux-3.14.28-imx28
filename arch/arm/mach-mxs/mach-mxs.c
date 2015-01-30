@@ -23,12 +23,14 @@
 #include <linux/of_address.h>
 #include <linux/of_platform.h>
 #include <linux/phy.h>
+#include <linux/phy_fixed.h>
 #include <linux/pinctrl/consumer.h>
 #include <linux/sys_soc.h>
 #include <asm/mach/arch.h>
 #include <asm/mach/map.h>
 #include <asm/mach/time.h>
 #include <asm/system_misc.h>
+#include <uapi/linux/swab.h>
 
 #include "pm.h"
 
@@ -241,6 +243,47 @@ static int apx4devkit_phy_fixup(struct phy_device *phy)
 	phy->dev_flags |= MICREL_PHY_50MHZ_CLK;
 	return 0;
 }
+
+#ifdef CONFIG_FIXED_PHY
+static int __init of_add_fixed_phys(void)
+{
+	int ret;
+	struct device_node *np;
+	u32 *fixed_link;
+	struct fixed_phy_status status = {};
+
+	for_each_node_by_name(np, "ethernet") {
+		fixed_link  = (u32 *)of_get_property(np, "fixed-link", NULL);
+		if (!fixed_link)
+			continue;
+
+		status.link = 1;
+		status.duplex = __swab32(fixed_link[1]);
+		status.speed = __swab32(fixed_link[2]);
+		status.pause = __swab32(fixed_link[3]);
+		status.asym_pause = __swab32(fixed_link[4]);
+		
+		ret = fixed_phy_add(PHY_POLL, __swab32(fixed_link[0]), &status);
+		if (ret) {
+			of_node_put(np);
+			return ret;
+		}
+	}
+
+	return 0;
+}
+arch_initcall(of_add_fixed_phys);
+#endif /* CONFIG_FIXED_PHY */
+
+
+static int imx28_ts7680_init(void) 
+{
+#ifdef CONFIG_FIXED_PHY   
+   of_add_fixed_phys();
+#endif   
+   return 0;
+}
+
 
 static void __init apx4devkit_init(void)
 {
@@ -457,8 +500,10 @@ static void __init mxs_machine_init(void)
 
 	if (of_machine_is_compatible("fsl,imx28-evk"))
 		imx28_evk_init();
-	else if (of_machine_is_compatible("fsl,imx28-ts7680"))
+	else if (of_machine_is_compatible("fsl,imx28-ts7680")) {
+	   imx28_ts7680_init();
 		imx28_evk_init();
+	}
 	else if (of_machine_is_compatible("bluegiga,apx4devkit"))
 		apx4devkit_init();
 	else if (of_machine_is_compatible("crystalfontz,cfa10036"))

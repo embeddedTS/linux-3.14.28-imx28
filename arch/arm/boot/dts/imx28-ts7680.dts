@@ -180,7 +180,6 @@
 				clock-frequency = <100000>;
 				status = "okay";
 
-				
 				rtc: isl12022@6f {
 				compatible = "isl,isl12022";
 				reg = <0x6f>;
@@ -267,6 +266,12 @@
 			phy-reset-gpios = <&gpio2 9 GPIO_ACTIVE_LOW>;
 			phy-reset-duration = <600>;
 			status = "okay";
+			
+	      phy: ethernet@0 {	   
+	         device_type = "network";	         				         	    
+	         fixed-link = <0 1 100 0 0>;
+	         };			
+
 		};
 
 		mac1: ethernet@800f4000 {
@@ -315,14 +320,5 @@
 			regulator-always-on;
 		};
 	};
-		
-	mdio: mdio@0 {	   
-	   device_type = "network";
-	   model = "FEC";
-	   compatible = "fsl,gianfar-mdio";
-	   phy-connection-type = "rmii";	    
-	   fixed-link = <0 1 100 0 0>;
-	};
-	
 };
 
