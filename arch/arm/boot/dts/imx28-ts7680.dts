@@ -161,6 +161,15 @@
 					fsl,pull-up = <MXS_PULL_ENABLE>;
 				};
 
+			  i2c1_gpio_pins: i2c1_gpio_pins@0 {			  
+			     fsl,pinmux-ids = <
+				      MX28_PAD_AUART0_RTS__GPIO_3_3   // E2_I2C_CLK
+				      MX28_PAD_AUART0_CTS__GPIO_3_2   // E2_I2C_DAT
+				   >;
+				   fsl,drive-strength = <MXS_DRIVE_4mA>;
+					fsl,voltage = <MXS_VOLTAGE_HIGH>;
+					fsl,pull-up = <MXS_PULL_ENABLE>;				  
+			  };				
 			};
 			
 			can0: can@80032000 {
@@ -198,31 +207,44 @@
 				status = "okay";
 
 				rtc: isl12022@6f {
-				compatible = "isl,isl12022";
+				compatible = "isl,isl12020";
 				reg = <0x6f>;
 				};
 								
-				cortexM0: cortextm0@78 {
-				compatible = "atmel,24c08";   // fix this!
-				reg = <0x78>;				
+				cortexM0: cortextm0@57 {
+				compatible = "ts7680,m0";
+				reg = <0x57>;				
 				};
 		   };
 
-/*
-			i2c1: i2c@8005a000 {
+			i2c1_gpio: i2c1_gpio@0 {
+			   compatible = "i2c-gpio";
+			   gpios = <&gpio3 2 0       // E2_I2C_DAT
+			         &gpio3 3 0          // E2_I2C_CLK
+			      >;
+			   i2c-gpio,sda-open-drain;
+			   i2c-gpio,scl-open-drain;
+			   i2c-gpio,delay-us = <2>;	/* ~100 kHz */
+			   i2c-gpio,timeout-ms = <500>; 
+			   #address-cells = <1>;
+			   #size-cells = <0>;			   
 				pinctrl-names = "default";
-				pinctrl-0 = <&i2c0_pins_b>;
-				clock-frequency = <100000>;
+				pinctrl-0 = <&i2c1_gpio_pins>;
 				status = "okay";
 				
 				eeprom: eeprom@51 {
-				compatible = "atmel,24c08";
-				reg = <0x51>;
-				pagesize = <16>;
+				   compatible = "at,24c08";
+				   reg = <0x51>;
+				   pagesize = <16>;
 				};
 				
+				fpga: fpga@28 {
+				//compatible = "at,24c08";   // fix this!
+				reg = <0x28>;	
+				pagesize = <1>;
+				};
 			};
-*/			
+			
 			duart: serial@80074000 {
 				pinctrl-names = "default";
 				pinctrl-0 = <&duart_pins_a>;
