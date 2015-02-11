@@ -18,7 +18,7 @@
 	compatible = "fsl,imx28-ts7680", "fsl,imx28";
 
 	memory {
-		reg = <0x40000000 0x08000000>;
+		reg = <0x40000000 0x08000000>;   /* 128MB */
 	};
 
 	apb@80000000 {
@@ -206,14 +206,14 @@
 				clock-frequency = <100000>;
 				status = "okay";
 
-				rtc: isl12022@6f {
+				rtc: isl12020@6f {
 				compatible = "isl,isl12020";
 				reg = <0x6f>;
 				};
-								
-				cortexM0: cortextm0@57 {
+
+				cortexM0: cortextm0@78 {
 				compatible = "ts7680,m0";
-				reg = <0x57>;				
+				reg = <0x78>;				
 				};
 		   };
 
@@ -304,7 +304,7 @@
 			clocks = <&clks 57>, <&clks 57>, <&clks 64>;
 			clock-names = "ipg", "ahb", "enet_out";
 			phy-reset-gpios = <&gpio2 9 GPIO_ACTIVE_LOW>;
-			phy-reset-duration = <600>;
+			phy-reset-duration = <1000>;
 			status = "okay";
 			
 	      phy: ethernet@0 {	   
