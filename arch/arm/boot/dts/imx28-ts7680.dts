@@ -134,14 +134,6 @@
 					fsl,pull-up = <MXS_PULL_ENABLE>;
 				};
 				
-				eth_reset_n: eth_reset_n {
-				fsl,pinmux-ids = <
-				      MX28_PAD_SSP0_DETECT__GPIO_2_9   // ETH_RESET#
-				   >;
-				   fsl,drive-strength = <MXS_DRIVE_4mA>;
-					fsl,voltage = <MXS_VOLTAGE_HIGH>;
-					fsl,pull-up = <MXS_PULL_ENABLE>;	
-				};
 
 				mac0_pins_ts7680: mac0@0 {
 					reg = <0>;
@@ -155,6 +147,7 @@
 					   MX28_PAD_ENET0_TXD0__ENET0_TXD0
 					   MX28_PAD_ENET0_TXD1__ENET0_TXD1
 					   MX28_PAD_ENET_CLK__CLKCTRL_ENET
+					   MX28_PAD_SSP0_DETECT__GPIO_2_9   // ETH_RESET#
 					>;
 					fsl,drive-strength = <MXS_DRIVE_8mA>;
 					fsl,voltage = <MXS_VOLTAGE_HIGH>;
@@ -299,8 +292,7 @@
 		mac0: ethernet@800f0000 {
 			phy-mode = "rmii";
 			pinctrl-names = "default";
-			pinctrl-0 = <&mac0_pins_ts7680
-			      &eth_reset_n>;
+			pinctrl-0 = <&mac0_pins_ts7680>;			      
 			clocks = <&clks 57>, <&clks 57>, <&clks 64>;
 			clock-names = "ipg", "ahb", "enet_out";
 			phy-reset-gpios = <&gpio2 9 GPIO_ACTIVE_LOW>;
