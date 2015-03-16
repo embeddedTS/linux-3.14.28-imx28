@@ -72,6 +72,16 @@
 				status = "okay";
 			};
 
+			ssp1: ssp@80012000 {
+				compatible = "fsl,imx28-mmc";
+				pinctrl-names = "default";
+				pinctrl-0 = <&mmc1_4bit_pins_ts7680>;					     					     
+				bus-width = <4>;
+				vmmc-supply = <&reg_vddio_sd0>;
+				status = "okay";
+											
+			};
+			
 			ssp2: ssp@80014000 {
 				#address-cells = <1>;
 				#size-cells = <0>;
@@ -134,6 +144,20 @@
 					fsl,pull-up = <MXS_PULL_ENABLE>;
 				};
 				
+				mmc1_4bit_pins_ts7680: mmc1-4bit@0 {   /* wifi */
+					reg = <0>;
+					fsl,pinmux-ids = <
+					   MX28_PAD_SSP0_DATA4__SSP2_D0
+						MX28_PAD_SSP0_DATA6__SSP2_CMD
+						MX28_PAD_SSP0_DATA7__SSP2_SCK
+						MX28_PAD_SSP2_SS1__SSP2_D1
+						MX28_PAD_SSP2_SS2__SSP2_D2
+						MX28_PAD_SSP0_DATA5__SSP2_D3						
+					>;
+					fsl,drive-strength = <MXS_DRIVE_8mA>;
+					fsl,voltage = <MXS_VOLTAGE_HIGH>;
+					fsl,pull-up = <MXS_PULL_ENABLE>;
+				};
 
 				mac0_pins_ts7680: mac0@0 {
 					reg = <0>;
@@ -230,11 +254,12 @@
 				   reg = <0x51>;
 				   pagesize = <16>;
 				};
-				
-				fpga: fpga@28 {
-				//compatible = "at,24c08";   // fix this!
-				reg = <0x28>;	
-				pagesize = <1>;
+						
+				gpio8: ts7680gpio@28 {
+				   compatible = "ts76xxgpio";
+				   reg = <0x28>;   
+				   #gpio-cells = <2>;
+				   gpio-controller;
 				};
 			};
 			
@@ -351,6 +376,14 @@
 			//gpio = <&gpio3 13 0>;
 			regulator-always-on;
 		};
+	};
+	
+	wlan {
+		compatible = "ti,wilink8";
+		interrupt-parent = <&gpio1>;
+		wlen-gpio = <&gpio8 14 0>;
+		interrupts = <26>;
+		interrupt-names = "wlan";
 	};
 };
 

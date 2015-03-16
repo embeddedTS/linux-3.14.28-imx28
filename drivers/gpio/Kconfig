@@ -283,6 +283,12 @@ config GPIO_TS5500
 	  blocks of the TS-5500: DIO1, DIO2 and the LCD port, and the TS-5600
 	  LCD port.
 
+config GPIO_TSGPIO
+	tristate "Technologic Systems FPGA I2C GPIO"
+	depends on I2C
+	help
+	  GPIO driver for TS I2C FPGA
+	  
 config GPIO_TZ1090
 	bool "Toumaz Xenif TZ1090 GPIO support"
 	depends on SOC_TZ1090
