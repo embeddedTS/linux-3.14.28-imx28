@@ -90,12 +90,10 @@ static inline int gpio_ts_read(struct i2c_client *client, u16 addr)
 static int ts_set_gpio_direction(struct i2c_client *client,
 	int gpio, int is_input)
 {
-	u8 reg;
+	u8 reg = 0;
 
 	dev_dbg(&client->dev, "%s setting gpio %d to is_input=%d\n", 
 		__func__, gpio, is_input);
-
-	reg = gpio_ts_read(client, gpio);
 	
 	if(is_input) reg &= 0x6;
 	else reg |= 0x1;
@@ -107,13 +105,11 @@ static int ts_set_gpio_direction(struct i2c_client *client,
 
 static int ts_set_gpio_dataout(struct i2c_client *client, int gpio, int enable)
 {
-	u8 reg;
+	u8 reg = 0;
 
 	dev_dbg(&client->dev, "%s setting gpio %d to output=%d\n", 
 		__func__, gpio, enable);
 
-	reg = gpio_ts_read(client, gpio);
-	
 	if(enable) reg |= 0x2;
 	else reg &= 0x5;
 
@@ -127,7 +123,6 @@ static int ts_get_gpio_datain(struct i2c_client *client, int gpio)
 	dev_dbg(&client->dev, "%s Getting GPIO %d Input\n", __func__, gpio);
 
 	addr = gpio;
-	if(gpio > 12) gpio += 44;
 
 	reg = gpio_ts_read(client, addr);
 
