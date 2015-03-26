@@ -41,6 +41,7 @@
 #include <linux/mmc/slot-gpio.h>
 #include <linux/gpio.h>
 #include <linux/regulator/consumer.h>
+#include <../drivers/regulator/internal.h>
 #include <linux/module.h>
 #include <linux/stmp_device.h>
 #include <linux/spi/mxs-spi.h>
@@ -70,6 +71,7 @@ struct mxs_mmc_host {
 	unsigned char			bus_width;
 	spinlock_t			lock;
 	int				sdio_irq_en;
+	int pwr_mode;
 };
 
 static int mxs_mmc_get_cd(struct mmc_host *mmc)
@@ -506,6 +508,27 @@ static void mxs_mmc_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 	else
 		host->bus_width = 0;
 
+	if (host->pwr_mode != ios->power_mode) {
+	   if (mmc->supply.vmmc == NULL || IS_ERR(mmc->supply.vmmc))
+	      mmc_regulator_get_supply(mmc);
+
+	   switch (ios->power_mode) {
+         case MMC_POWER_ON:
+            if (mmc->supply.vmmc && (!IS_ERR(mmc->supply.vmmc))) {
+               if (regulator_enable(mmc->supply.vmmc) == 0)
+               host->pwr_mode = ios->power_mode;
+            }
+            break;
+
+         case MMC_POWER_OFF:
+            if (mmc->supply.vmmc && (!IS_ERR(mmc->supply.vmmc))) {
+               if (regulator_disable(mmc->supply.vmmc) == 0)
+                  host->pwr_mode = ios->power_mode;
+            }
+            break;
+      }
+   }
+
 	if (ios->clock)
 		mxs_ssp_set_clk_rate(&host->ssp, ios->clock);
 }
@@ -601,6 +624,7 @@ static int mxs_mmc_probe(struct platform_device *pdev)
 
 	host->mmc = mmc;
 	host->sdio_irq_en = 0;
+	host->pwr_mode = -1;
 
 	reg_vmmc = devm_regulator_get(&pdev->dev, "vmmc");
 	if (!IS_ERR(reg_vmmc)) {
@@ -610,7 +634,8 @@ static int mxs_mmc_probe(struct platform_device *pdev)
 				"Failed to enable vmmc regulator: %d\n", ret);
 			goto out_mmc_free;
 		}
-	}
+		host->mmc->supply.vmmc = reg_vmmc;
+	} else host->mmc->supply.vmmc = NULL;
 
 	ssp->clk = devm_clk_get(&pdev->dev, NULL);
 	if (IS_ERR(ssp->clk)) {
@@ -645,7 +670,7 @@ static int mxs_mmc_probe(struct platform_device *pdev)
 	if (ret)
 		goto out_clk_disable;
 
-	mmc->ocr_avail = MMC_VDD_32_33 | MMC_VDD_33_34;
+	mmc->ocr_avail = MMC_VDD_32_33 | MMC_VDD_33_34 | MMC_VDD_165_195;
 
 	mmc->max_segs = 52;
 	mmc->max_blk_size = 1 << 0xf;

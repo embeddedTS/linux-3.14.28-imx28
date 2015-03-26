@@ -12,6 +12,7 @@
 /dts-v1/;
 #include "imx28.dtsi"
 #include "dt-bindings/gpio/gpio.h"
+#include <dt-bindings/interrupt-controller/irq.h>
 
 / {
 	model = "Technologic Systems i.MX28 TS-7680 (Default Device Tree)";
@@ -28,7 +29,7 @@
 				#address-cells = <1>;
 				#size-cells = <1>;
 				pinctrl-names = "default";
-				pinctrl-0 = <&gpmi_pins_a &gpmi_status_cfg>;
+				pinctrl-0 = <&gpmi_pins_ts7680 &gpmi_status_cfg_ts7680>;
 				status = "okay";
 
 				partition@0 {
@@ -61,6 +62,13 @@
 			
 			ssp0: ssp@80010000 {
 				compatible = "fsl,imx28-mmc";
+				#address-cells = <1>;
+				#size-cells = <0>;
+				reg = <0x80010000 0x2000>;
+				interrupts = <96>;
+				clocks = <&clks 46>;
+				dmas = <&dma_apbh 0>;
+				dma-names = "rx-tx";
 				pinctrl-names = "default";
 				pinctrl-0 = <&mmc0_4bit_pins_ts7680					     
 					     &mmc0_sck_cfg
@@ -71,55 +79,26 @@
 				vmmc-supply = <&reg_vddio_sd0>;
 				status = "okay";
 			};
-
-			ssp1: ssp@80012000 {
+						
+			ssp2: ssp@80014000 {
 				compatible = "fsl,imx28-mmc";
+				max-frequency = <26000000>;
 				pinctrl-names = "default";
-				pinctrl-0 = <&mmc1_4bit_pins_ts7680>;					     					     
+				pinctrl-0 = <&mmc1_4bit_pins_ts7680 
+				            &mmc_sck_cfg 
+				            &wifi_irq>;
+				broken-cd = <1>;				
+				cap-sdio-irq;
+				non-removable;
 				bus-width = <4>;
-				vmmc-supply = <&reg_vddio_sd0>;
+				vmmc-supply = <&wl12xx_vmmc>;
 				status = "okay";
-											
 			};
 			
-			ssp2: ssp@80014000 {
-				#address-cells = <1>;
-				#size-cells = <0>;
-				compatible = "fsl,imx28-spi";
-				pinctrl-names = "default";
-				pinctrl-0 = <&spi2_pins_a>;
-				status = "okay";
-
-				/*
-				flash: m25p80@0 {
-					#address-cells = <1>;
-					#size-cells = <1>;
-					compatible = "m25p80";
-					spi-max-frequency = <40000000>;
-					reg = <0>;
-				};
-				*/
-				
-			};
-
+			
 			pinctrl@80018000 {
 				pinctrl-names = "default";
-				pinctrl-0 = <&hog_pins_a>;
-
-				hog_pins_a: hog@0 {
-					reg = <0>;
-					fsl,pinmux-ids = <
-						MX28_PAD_PWM3__GPIO_3_28
-						MX28_PAD_AUART2_CTS__GPIO_3_10
-						MX28_PAD_AUART2_RTS__GPIO_3_11
-						MX28_PAD_AUART3_RX__GPIO_3_12
-						MX28_PAD_AUART3_TX__GPIO_3_13
-					>;
-					fsl,drive-strength = <MXS_DRIVE_4mA>;
-					fsl,voltage = <MXS_VOLTAGE_HIGH>;
-					fsl,pull-up = <MXS_PULL_DISABLE>;
-				};
-			
+				
 				en_sd_pwr: en_sd_pwr {
 				   fsl,pinmux-ids = <
 				      MX28_PAD_PWM3__GPIO_3_28   // EN_SD_POWER#
@@ -148,17 +127,74 @@
 					reg = <0>;
 					fsl,pinmux-ids = <
 					   MX28_PAD_SSP0_DATA4__SSP2_D0
-						MX28_PAD_SSP0_DATA6__SSP2_CMD
-						MX28_PAD_SSP0_DATA7__SSP2_SCK
-						MX28_PAD_SSP2_SS1__SSP2_D1
+					   MX28_PAD_SSP2_SS1__SSP2_D1
 						MX28_PAD_SSP2_SS2__SSP2_D2
-						MX28_PAD_SSP0_DATA5__SSP2_D3						
+						MX28_PAD_SSP0_DATA5__SSP2_D3
+						MX28_PAD_SSP0_DATA6__SSP2_CMD
+						MX28_PAD_SSP0_DATA7__SSP2_SCK						
+						MX28_PAD_LCD_D22__GPIO_1_22
 					>;
 					fsl,drive-strength = <MXS_DRIVE_8mA>;
-					fsl,voltage = <MXS_VOLTAGE_HIGH>;
+					fsl,voltage = <MXS_VOLTAGE_LOW>;
 					fsl,pull-up = <MXS_PULL_ENABLE>;
 				};
 
+				
+				wifi_irq: wifi-irq {									
+					fsl,pinmux-ids = <					   
+						MX28_PAD_LCD_D22__GPIO_1_22
+					>;
+					fsl,drive-strength = <MXS_DRIVE_8mA>;
+					fsl,pull-up = <MXS_PULL_ENABLE>;
+				};
+
+				mmc_sck_cfg: mmc-sck-cfg {
+					fsl,pinmux-ids = <
+						MX28_PAD_SSP0_DATA7__SSP2_SCK
+					>;
+					fsl,drive-strength = <MXS_DRIVE_12mA>;
+					fsl,pull-up = <MXS_PULL_DISABLE>;
+				};
+				
+								
+				gpmi_pins_ts7680: gpmi-nand-ts7680@0 {
+					reg = <0>;
+					fsl,pinmux-ids = <
+						MX28_PAD_GPMI_D00__GPMI_D0
+						MX28_PAD_GPMI_D01__GPMI_D1
+						MX28_PAD_GPMI_D02__GPMI_D2
+						MX28_PAD_GPMI_D03__GPMI_D3
+						MX28_PAD_GPMI_D04__GPMI_D4
+						MX28_PAD_GPMI_D05__GPMI_D5
+						MX28_PAD_GPMI_D06__GPMI_D6
+						MX28_PAD_GPMI_D07__GPMI_D7
+						MX28_PAD_GPMI_CE0N__GPMI_CE0N
+						MX28_PAD_GPMI_RDY0__GPMI_READY0
+						MX28_PAD_GPMI_RDN__GPMI_RDN
+						MX28_PAD_GPMI_WRN__GPMI_WRN
+						MX28_PAD_GPMI_ALE__GPMI_ALE
+						MX28_PAD_GPMI_CLE__SSP3_D2
+						MX28_PAD_GPMI_CLE__GPMI_CLE
+						MX28_PAD_GPMI_RDY1__GPIO_0_21      /* NC */
+						MX28_PAD_GPMI_CE1N__GPIO_0_17      /* RED_LED# */
+						MX28_PAD_GPMI_RESETN__GPIO_0_28    /* GREEN_LED# */
+					>;
+					fsl,drive-strength = <MXS_DRIVE_4mA>;
+					fsl,voltage = <MXS_VOLTAGE_HIGH>;
+					fsl,pull-up = <MXS_PULL_ENABLE>;
+				};
+				
+				gpmi_status_cfg_ts7680: gpmi-status-cfg-ts7680 {
+					fsl,pinmux-ids = <
+						MX28_PAD_GPMI_RDN__GPMI_RDN
+						MX28_PAD_GPMI_WRN__GPMI_WRN						
+						MX28_PAD_GPMI_CE1N__GPIO_0_17      /* RED_LED# */
+						MX28_PAD_GPMI_RESETN__GPIO_0_28    /* GREEN_LED# */
+					>;
+					
+					fsl,drive-strength = <MXS_DRIVE_12mA>;
+				};
+				
 				mac0_pins_ts7680: mac0@0 {
 					reg = <0>;
 					fsl,pinmux-ids = <
@@ -187,6 +223,20 @@
 					fsl,voltage = <MXS_VOLTAGE_HIGH>;
 					fsl,pull-up = <MXS_PULL_ENABLE>;				  
 			  };				
+			  
+			  
+			  spi_boot_pins: spi-boot-pins@0 {   /* FPGA SPI */
+			      reg = <0>;
+					fsl,pinmux-ids = <
+						MX28_PAD_SSP2_SCK__AUART2_RX
+						MX28_PAD_SSP2_MOSI__AUART2_TX
+						MX28_PAD_SSP2_MISO__AUART3_RX
+						MX28_PAD_SSP2_SS0__AUART3_TX
+					>;
+					fsl,drive-strength = <MXS_DRIVE_4mA>;
+					fsl,voltage = <MXS_VOLTAGE_HIGH>;
+					fsl,pull-up = <MXS_PULL_DISABLE>;
+				};
 			};
 			
 			can0: can@80032000 {
@@ -271,21 +321,17 @@
 
 			usbphy0: usbphy@8007c000 {
 				status = "okay";
+								
 			};
 
 			usbphy1: usbphy@8007e000 {			   
 				status = "okay";
 			};
 
-			auart1: serial@8006c000 {
-				pinctrl-names = "default";
-				pinctrl-0 = <&auart1_pins_a>;
-				status = "okay";
-			};
 
 			auart2: serial@8006e000 {
 				pinctrl-names = "default";
-				pinctrl-0 = <&auart2_2pins_b>;
+				pinctrl-0 = <&spi_boot_pins>;
 				status = "okay";
 			};
 
@@ -302,7 +348,7 @@
 			vbus-supply = <&reg_usb0_vbus>;
 			pinctrl-names = "default";
 			pinctrl-0 = <&usbphy0_pins_a>;
-			status = "okay";
+			status = "disabled";
 		};
 
 		usb1: usb@80090000 {
@@ -311,7 +357,7 @@
 			pinctrl-0 = <&usbphy1_pins_a>;
 			disable-over-current;
 			dr_mode = "host";
-			status = "okay";
+			status = "disabled";
 		};
 
 		mac0: ethernet@800f0000 {
@@ -323,7 +369,7 @@
 			phy-reset-gpios = <&gpio2 9 GPIO_ACTIVE_LOW>;
 			phy-reset-duration = <1000>;
 			status = "okay";
-			
+
 	      phy: ethernet@0 {	   
 	         device_type = "network";	         				         	    
 	         fixed-link = <0 1 100 0 0>;
@@ -349,16 +395,18 @@
 			regulator-max-microvolt = <3300000>;
 			regulator-always-on;
 		};
-
+		
+		
 		reg_vddio_sd0: vddio-sd0 {
 			compatible = "regulator-fixed";
 			regulator-name = "vddio-sd0";
 			regulator-min-microvolt = <3300000>;
 			regulator-max-microvolt = <3300000>;
-			regulator-always-on;
+			regulator-boot-on;
 			//gpio = <&gpio3 28 0>;
-		};
-
+			};
+	
+		
 		reg_usb0_vbus: usb0_vbus {
 			compatible = "regulator-fixed";
 			regulator-name = "usb0_vbus";
@@ -376,14 +424,31 @@
 			//gpio = <&gpio3 13 0>;
 			regulator-always-on;
 		};
+		
+		
+		wl12xx_vmmc: wl12xx-vmmc {		
+			compatible = "regulator-fixed";
+			regulator-name = "vddio-sd1";
+			regulator-min-microvolt = <1800000>;
+			regulator-max-microvolt = <1800000>;
+			gpio = <&gpio8 44 0>;
+			startup-delay-us = <70000>;
+			enable-active-high;
+			regulator-boot-on;
+		};
+
+
 	};
 	
-	wlan {
-		compatible = "ti,wilink8";
+	wlan  {
+      compatible = "ti,wilink8";		
 		interrupt-parent = <&gpio1>;
-		wlen-gpio = <&gpio8 14 0>;
-		interrupts = <26>;
+		//wlen-gpio = <&gpio8 44 1>;
+		interrupts = <22 IRQ_TYPE_EDGE_FALLING>;
 		interrupt-names = "wlan";
+		status = "okay";
 	};
+				
 };
+
 
