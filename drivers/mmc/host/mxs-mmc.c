@@ -41,7 +41,6 @@
 #include <linux/mmc/slot-gpio.h>
 #include <linux/gpio.h>
 #include <linux/regulator/consumer.h>
-#include <../drivers/regulator/internal.h>
 #include <linux/module.h>
 #include <linux/stmp_device.h>
 #include <linux/spi/mxs-spi.h>
