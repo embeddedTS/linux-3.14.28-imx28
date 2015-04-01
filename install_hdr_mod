@@ -1,0 +1,48 @@
+#!/bin/bash
+
+if [ $# -ne 1 ] ; then
+  echo "Usage: $0 <device>"
+  echo "Where <device> is name of root filesystem device, e.g. sda3, sdb3, mmcblk0p3, etc."
+  exit 1
+fi
+
+mkdir mount_point/ &&\
+sudo mount /dev/$1 mount_point/ &&\
+(
+  echo "Installing kernel modules to device $1"
+  INSTALL_MOD_PATH=mount_point/ sudo -E make modules_install >/dev/null 2>&1 
+  if [ $? -ne "0" ] ; then
+    echo "Failed to install modules to device $1"
+    exit 1
+  fi
+) &&\
+
+(
+  echo "Installing kernel headers to device $1"
+  INSTALL_HDR_PATH=mount_point/ sudo -E make headers_install >/dev/null 2>&1
+  if [ $? -ne "0" ] ; then
+    echo "Failed to install kernel headers to device $1"
+    exit 1
+  fi
+) &&\
+
+(
+  echo "Copying U-Boot kernel to device $1"
+  sudo -E cp arch/arm/boot/uImage mount_point/boot
+  if [ $? -ne "0" ] ; then
+    echo "Failed to failed to copy U-Boot kernel to device $1"
+    exit 1
+  fi
+) && \
+
+(
+  echo "Copying device-tree to device $1"
+  sudo -E cp arch/arm/boot/dts/imx28-ts*.dtb mount_point/boot
+  if [ $? -ne "0" ] ; then
+    echo "Failed to failed to copy device-tree to device $1"
+    exit 1
+  fi
+) && \
+
+sudo umount mount_point
+rmdir mount_point
