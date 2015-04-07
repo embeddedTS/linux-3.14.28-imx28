@@ -358,13 +358,6 @@
 	         fixed-link = <0 1 100 0 0>;
 	         };
 		};
-
-		mac1: ethernet@800f4000 {
-			phy-mode = "rmii";
-			pinctrl-names = "default";
-			pinctrl-0 = <&mac1_pins_a>;
-			status = "okay";
-		};
 	};
 
 	regulators {
