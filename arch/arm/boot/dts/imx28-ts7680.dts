@@ -214,18 +214,39 @@
 			  };				
 			  
 			  
-			  spi_boot_pins: spi-boot-pins@0 {   /* FPGA SPI */
+			  spi_boot_pins_auart2: spi-boot-pins-auart2@0 {
 			      reg = <0>;
 					fsl,pinmux-ids = <
 						MX28_PAD_SSP2_SCK__AUART2_RX
 						MX28_PAD_SSP2_MOSI__AUART2_TX
+					>;
+					fsl,drive-strength = <MXS_DRIVE_4mA>;
+					fsl,voltage = <MXS_VOLTAGE_HIGH>;
+					fsl,pull-up = <MXS_PULL_DISABLE>;
+			  };
+
+			  spi_boot_pins_auart3: spi-boot-pins-auart3@0 {
+			      reg = <0>;
+					fsl,pinmux-ids = <
 						MX28_PAD_SSP2_MISO__AUART3_RX
 						MX28_PAD_SSP2_SS0__AUART3_TX
 					>;
 					fsl,drive-strength = <MXS_DRIVE_4mA>;
 					fsl,voltage = <MXS_VOLTAGE_HIGH>;
 					fsl,pull-up = <MXS_PULL_DISABLE>;
-				};
+			  };
+
+			  auart4_pins: auart4@0 {
+			      reg = <0>;
+					fsl,pinmux-ids = <
+						MX28_PAD_SAIF0_BITCLK__AUART4_RX
+						MX28_PAD_SAIF0_SDATA0__AUART4_TX
+						>;
+					fsl,drive-strength = <MXS_DRIVE_4mA>;
+					fsl,voltage = <MXS_VOLTAGE_HIGH>;
+					fsl,pull-up = <MXS_PULL_DISABLE>;
+			  };
+
 			};
 			
 			can0: can@80032000 {
@@ -321,9 +342,33 @@
 			};
 
 
+			auart0: serial@8006a000 {
+				pinctrl-names = "default";
+				pinctrl-0 = <&auart0_2pins_a>;
+				status = "okay";
+			};
+
+			auart1: serial@8006c000 {
+				pinctrl-names = "default";
+				pinctrl-0 = <&auart1_2pins_a>;
+				status = "okay";
+			};
+
 			auart2: serial@8006e000 {
 				pinctrl-names = "default";
-				pinctrl-0 = <&spi_boot_pins>;
+				pinctrl-0 = <&spi_boot_pins_auart2>;
+				status = "okay";
+			};
+
+			auart3: serial@80070000 {
+				pinctrl-names = "default";
+				pinctrl-0 = <&spi_boot_pins_auart3>;
+				status = "okay";
+			};
+
+			auart4: serial@80072000 {
+				pinctrl-names = "default";
+				pinctrl-0 = <&auart4_pins>;
 				status = "okay";
 			};
 
