@@ -25,30 +25,6 @@
 	apb@80000000 {
 		apbh@80000000 {
 		
-			gpmi-nand@8000c000 {
-				#address-cells = <1>;
-				#size-cells = <1>;
-				pinctrl-names = "default";
-				pinctrl-0 = <&gpmi_pins_ts7680 &gpmi_status_cfg_ts7680>;
-				status = "okay";
-
-				partition@0 {
-					label = "bootloader";
-					reg = <0x00000000 0x01400000>;
-				};
-
-				partition@1 {
-					label = "tspart";
-					reg = <0x01400000 0x01400000>;
-				};
-
-				partition@2 {
-					label = "filesystem";
-					reg = <0x02800000 0x7D800000>;
-				};
-			};
-	   
-			
 			ssp0: ssp@80010000 {
 				compatible = "fsl,imx28-mmc";
 				#address-cells = <1>;
@@ -64,7 +40,6 @@
 					     &en_sd_pwr>;
 				broken-cd = <1>;	     
 				bus-width = <4>;
-				wp-gpios = <&gpio3 10 0>;
 				vmmc-supply = <&reg_vddio_sd0>;
 				status = "okay";
 			};
@@ -83,6 +58,37 @@
 				vmmc-supply = <&wl12xx_vmmc>;
 				status = "okay";
 			};
+
+			ssp3: ssp@80016000 {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				compatible = "fsl,imx28-spi";
+				pinctrl-names = "default";
+				pinctrl-0 = <&spi3_pins_b>;
+				status = "okay";
+
+				touch: tsc2046@0 {
+					compatible = "ti,tsc2046";
+					reg = <0>;
+					interrupt-parent = <&gpio0>;
+					interrupts = <6 2>;
+					spi-max-frequency = <2000000>;
+					pendown-gpio = <&gpio0 6 0>;
+					ti,penirq-recheck-delay-usecs = /bits/ 16 <5000>;
+					ti,vref-mv = <3300>;
+					ti,swap-xy;
+					ti,keep-vref-on;
+					ti,settle-delay-usec = /bits/ 16 <5000>;
+					ti,vref-delay-usecs = /bits/ 16 <0>;
+					ti,x-plate-ohms = /bits/ 16 <715>;
+					ti,y-plate-ohms = /bits/ 16 <325>;
+					ti,debounce-rep = /bits/ 16 <3>;
+					ti,debounce-tol = /bits/ 16 <65535>;
+					ti,debounce-max = /bits/ 16 <0>;
+					ti,pendown-gpio-debounce = <100000>;
+					linux,wakeup;
+				};
+			};
 			
 			
 			pinctrl@80018000 {
@@ -96,7 +102,55 @@
 					fsl,voltage = <MXS_VOLTAGE_HIGH>;
 					fsl,pull-up = <MXS_PULL_DISABLE>;				   
 				};
-								
+
+				ts7695_lcdif_pins: ts7695_lcdif_pins {
+					reg = <0>;
+					fsl,pinmux-ids = <
+						MX28_PAD_LCD_D01__LCD_D1
+						MX28_PAD_LCD_D02__LCD_D2
+						MX28_PAD_LCD_D03__LCD_D3
+						MX28_PAD_LCD_D04__LCD_D4
+						MX28_PAD_LCD_D05__LCD_D5
+						MX28_PAD_LCD_D06__LCD_D6
+						MX28_PAD_LCD_D07__LCD_D7
+						MX28_PAD_LCD_D09__LCD_D9
+						MX28_PAD_LCD_D10__LCD_D10
+						MX28_PAD_LCD_D11__LCD_D11
+						MX28_PAD_LCD_D12__LCD_D12
+						MX28_PAD_LCD_D13__LCD_D13
+						MX28_PAD_LCD_D14__LCD_D14
+						MX28_PAD_LCD_D15__LCD_D15
+						MX28_PAD_LCD_D17__LCD_D17
+						MX28_PAD_LCD_D18__LCD_D18
+						MX28_PAD_LCD_D19__LCD_D19
+						MX28_PAD_LCD_D20__LCD_D20
+						MX28_PAD_LCD_D21__LCD_D21
+						MX28_PAD_LCD_D22__LCD_D22
+						MX28_PAD_LCD_D23__LCD_D23
+						MX28_PAD_LCD_CS__LCD_ENABLE
+						MX28_PAD_LCD_RS__LCD_DOTCLK
+					>;
+					fsl,drive-strength = <MXS_DRIVE_4mA>;
+					fsl,voltage = <MXS_VOLTAGE_HIGH>;
+					fsl,pull-up = <MXS_PULL_DISABLE>;
+				};
+
+				/* XXX: some of these are in GPIO mode still */
+				spi3_pins_b: ts7695touchpins {
+					reg = <0>;
+					fsl,pinmux-ids = <
+						MX28_PAD_GPMI_RDN__SSP3_SCK
+						MX28_PAD_GPMI_RESETN__SSP3_CMD
+						MX28_PAD_GPMI_CE0N__SSP3_D0
+						MX28_PAD_GPMI_CE1N__SSP3_D3
+						MX28_PAD_GPMI_ALE__SSP3_D1
+						MX28_PAD_GPMI_CLE__SSP3_D2
+					>;
+					fsl,drive-strength = <MXS_DRIVE_8mA>;
+					fsl,voltage = <MXS_VOLTAGE_HIGH>;
+					fsl,pull-up = <MXS_PULL_DISABLE>;
+				};
+
 				mmc0_4bit_pins_ts7680: mmc0-4bit@0 {
 					reg = <0>;
 					fsl,pinmux-ids = <
@@ -115,13 +169,13 @@
 				mmc1_4bit_pins_ts7680: mmc1-4bit@0 {   /* wifi */
 					reg = <0>;
 					fsl,pinmux-ids = <
-					   MX28_PAD_SSP0_DATA4__SSP2_D0
-					   MX28_PAD_SSP2_SS1__SSP2_D1
+						MX28_PAD_SSP0_DATA4__SSP2_D0
+						MX28_PAD_SSP2_SS1__SSP2_D1
 						MX28_PAD_SSP2_SS2__SSP2_D2
 						MX28_PAD_SSP0_DATA5__SSP2_D3
 						MX28_PAD_SSP0_DATA6__SSP2_CMD
 						MX28_PAD_SSP0_DATA7__SSP2_SCK						
-						MX28_PAD_LCD_D22__GPIO_1_22
+						MX28_PAD_SSP0_DETECT__GPIO_2_9
 					>;
 					fsl,drive-strength = <MXS_DRIVE_8mA>;
 					fsl,voltage = <MXS_VOLTAGE_LOW>;
@@ -145,45 +199,6 @@
 					fsl,pull-up = <MXS_PULL_DISABLE>;
 				};
 				
-								
-				gpmi_pins_ts7680: gpmi-nand-ts7680@0 {
-					reg = <0>;
-					fsl,pinmux-ids = <
-						MX28_PAD_GPMI_D00__GPMI_D0
-						MX28_PAD_GPMI_D01__GPMI_D1
-						MX28_PAD_GPMI_D02__GPMI_D2
-						MX28_PAD_GPMI_D03__GPMI_D3
-						MX28_PAD_GPMI_D04__GPMI_D4
-						MX28_PAD_GPMI_D05__GPMI_D5
-						MX28_PAD_GPMI_D06__GPMI_D6
-						MX28_PAD_GPMI_D07__GPMI_D7
-						MX28_PAD_GPMI_CE0N__GPMI_CE0N
-						MX28_PAD_GPMI_RDY0__GPMI_READY0
-						MX28_PAD_GPMI_RDN__GPMI_RDN
-						MX28_PAD_GPMI_WRN__GPMI_WRN
-						MX28_PAD_GPMI_ALE__GPMI_ALE
-						MX28_PAD_GPMI_CLE__SSP3_D2
-						MX28_PAD_GPMI_CLE__GPMI_CLE
-						MX28_PAD_GPMI_RDY1__GPIO_0_21      /* NC */
-						MX28_PAD_GPMI_CE1N__GPIO_0_17      /* RED_LED# */
-						MX28_PAD_GPMI_RESETN__GPIO_0_28    /* GREEN_LED# */
-					>;
-					fsl,drive-strength = <MXS_DRIVE_4mA>;
-					fsl,voltage = <MXS_VOLTAGE_HIGH>;
-					fsl,pull-up = <MXS_PULL_ENABLE>;
-				};
-				
-				gpmi_status_cfg_ts7680: gpmi-status-cfg-ts7680 {
-					fsl,pinmux-ids = <
-						MX28_PAD_GPMI_RDN__GPMI_RDN
-						MX28_PAD_GPMI_WRN__GPMI_WRN						
-						MX28_PAD_GPMI_CE1N__GPIO_0_17      /* RED_LED# */
-						MX28_PAD_GPMI_RESETN__GPIO_0_28    /* GREEN_LED# */
-					>;
-					
-					fsl,drive-strength = <MXS_DRIVE_12mA>;
-				};
-				
 				mac0_pins_ts7680: mac0@0 {
 					reg = <0>;
 					fsl,pinmux-ids = <
@@ -196,7 +211,7 @@
 					   MX28_PAD_ENET0_TXD0__ENET0_TXD0
 					   MX28_PAD_ENET0_TXD1__ENET0_TXD1
 					   MX28_PAD_ENET_CLK__CLKCTRL_ENET
-					   MX28_PAD_SSP0_DETECT__GPIO_2_9   // ETH_RESET#
+					   //MX28_PAD_SSP0_DETECT__GPIO_2_9   // ETH_RESET#
 					>;
 					fsl,drive-strength = <MXS_DRIVE_8mA>;
 					fsl,voltage = <MXS_VOLTAGE_HIGH>;
@@ -260,9 +275,39 @@
 				pinctrl-0 = <&can1_pins_a>;
 				status = "okay";
 			};
-			
-			
-			
+
+			lcdif@80030000 {
+				compatible = "fsl,imx28-lcdif";
+				pinctrl-names = "default";
+				pinctrl-0 = <&ts7695_lcdif_pins>;
+				lcd-supply = <&reg_lcd_3v3>;
+				display = <&display>;
+				status = "okay";
+	
+				display: display {
+					bits-per-pixel = <32>;
+					bus-width = <24>;
+	
+					display-timings {
+						native-mode = <&timing0>;
+						timing0: timing0 {
+							clock-frequency = <33500000>;
+							hactive = <800>;
+							vactive = <480>;
+							hback-porch = <89>;
+							hfront-porch = <164>;
+							vback-porch = <23>;
+							vfront-porch = <10>;
+							hsync-len = <10>;
+							vsync-len = <10>;
+							hsync-active = <0>;
+							vsync-active = <0>;
+							de-active = <1>;
+							pixelclk-active = <0>;
+						};
+					};
+				};
+			};
 		};
 
 		apbx@80040000 {
@@ -286,9 +331,9 @@
 				clock-frequency = <100000>;
 				status = "okay";
 
-				rtc: isl12020@6f {
-				compatible = "isl,isl12020";
-				reg = <0x6f>;
+				rtc: m41t00s@68 {
+					compatible = "isl,isl12020";
+					reg = <0x68>;
 				};
 
 				cortexM0: cortextm0@78 {
@@ -374,7 +419,7 @@
 
 			pwm: pwm@80064000 {
 				pinctrl-names = "default";
-				pinctrl-0 = <&pwm4_pins_a>;
+				pinctrl-0 = <&pwm2_pins_a>;
 				status = "okay";
 			};
 		};
@@ -457,15 +502,39 @@
 			regulator-boot-on;
 		};
 
+		reg_lcd_3v3: lcd-3v3 {
+			compatible = "regulator-fixed";
+			regulator-name = "lcd-3v3";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			gpio = <&gpio3 30 0>;
+			enable-active-high;
+		};
+
 
 	};
 	
 	wlan  {
-      compatible = "ti,wilink8";		
+		compatible = "ti,wilink8";		
 		interrupt-parent = <&gpio1>;		
 		interrupts = <22 IRQ_TYPE_EDGE_FALLING>;
 		interrupt-names = "wlan";
 		status = "okay";
+	};
+
+	/*fpga_clock {
+		compatible = "pwm-clock";
+		#clock-cells = <0>;
+		clock-frequency = <12000000>;
+		clock-output-names = "fpga_12mhz";
+                pwms = <&pwm 2 84>; // 1 / 84 ns = 12ish MHz 
+        };*/
+
+	backlight {
+		compatible = "pwm-backlight";
+		pwms = <&pwm 2 84>;
+		brightness-levels = <0 4 8 16 32 64 128 255>;
+		default-brightness-level = <6>;
 	};
 				
 };
