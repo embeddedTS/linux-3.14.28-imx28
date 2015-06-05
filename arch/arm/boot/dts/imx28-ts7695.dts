@@ -15,8 +15,14 @@
 #include <dt-bindings/interrupt-controller/irq.h>
 
 / {
+
 	model = "Technologic Systems i.MX28 TS-7680 (Default Device Tree)";
 	compatible = "fsl,imx28-ts7680", "fsl,imx28";
+
+	aliases {
+		mmc0 = &ssp0;
+		mmc2 = &ssp1;
+	};
 
 	memory {
 		reg = <0x40000000 0x08000000>;   /* 128MB */
@@ -27,16 +33,20 @@
 		
 			ssp0: ssp@80010000 {
 				compatible = "fsl,imx28-mmc";
-				#address-cells = <1>;
-				#size-cells = <0>;
-				reg = <0x80010000 0x2000>;
-				interrupts = <96>;
-				clocks = <&clks 46>;
-				dmas = <&dma_apbh 0>;
-				dma-names = "rx-tx";
 				pinctrl-names = "default";
-				pinctrl-0 = <&mmc0_4bit_pins_ts7680					     
+				pinctrl-0 = <&mmc0_4bit_pins_ts7680
 					     &mmc0_sck_cfg
+					     &en_sd_pwr>;
+				broken-cd = <1>;	     
+				bus-width = <4>;
+				vmmc-supply = <&reg_vddio_sd0>;
+				status = "okay";
+			};
+
+			ssp1: ssp@80012000 {
+				compatible = "fsl,imx28-mmc";
+				pinctrl-names = "default";
+				pinctrl-0 = <&mmc1_4bit_pins
 					     &en_sd_pwr>;
 				broken-cd = <1>;	     
 				bus-width = <4>;
@@ -48,7 +58,7 @@
 				compatible = "fsl,imx28-mmc";
 				max-frequency = <26000000>;
 				pinctrl-names = "default";
-				pinctrl-0 = <&mmc1_4bit_pins_ts7680 
+				pinctrl-0 = <&mmc2_4bit_pins
 				            &mmc_sck_cfg 
 				            &wifi_irq>;
 				broken-cd = <1>;				
@@ -165,8 +175,24 @@
 					fsl,voltage = <MXS_VOLTAGE_HIGH>;
 					fsl,pull-up = <MXS_PULL_ENABLE>;
 				};
+
+				mmc1_4bit_pins: mmc1-4bit@0 {
+					reg = <0>;
+					fsl,pinmux-ids = <
+						MX28_PAD_GPMI_WRN__SSP1_SCK
+
+						MX28_PAD_GPMI_RDY1__SSP1_CMD
+						MX28_PAD_GPMI_D00__SSP1_D0
+						MX28_PAD_GPMI_D01__SSP1_D1
+						MX28_PAD_GPMI_D02__SSP1_D2
+						MX28_PAD_GPMI_D03__SSP1_D3
+					>;
+					fsl,drive-strength = <MXS_DRIVE_8mA>;
+					fsl,voltage = <MXS_VOLTAGE_HIGH>;
+					fsl,pull-up = <MXS_PULL_ENABLE>;
+				};
 				
-				mmc1_4bit_pins_ts7680: mmc1-4bit@0 {   /* wifi */
+				mmc2_4bit_pins: mmc2-4bit@0 {   /* wifi */
 					reg = <0>;
 					fsl,pinmux-ids = <
 						MX28_PAD_SSP0_DATA4__SSP2_D0
