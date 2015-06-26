@@ -357,6 +357,14 @@
 				clock-frequency = <100000>;
 				status = "okay";
 
+				sgtl5000: codec@0a {
+					compatible = "fsl,sgtl5000";
+					reg = <0x0a>;
+					VDDA-supply = <&reg_3p3v>;
+					VDDIO-supply = <&reg_3p3v>;
+					clocks = <&saif0>;
+				};
+
 				rtc: m41t00s@68 {
 					compatible = "m41t00";
 					reg = <0x68>;
@@ -440,7 +448,7 @@
 			auart4: serial@80072000 {
 				pinctrl-names = "default";
 				pinctrl-0 = <&auart4_pins>;
-				status = "okay";
+				status = "disabled";
 			};
 
 			pwm: pwm@80064000 {
@@ -555,6 +563,14 @@
 		clock-output-names = "fpga_12mhz";
                 pwms = <&pwm 2 84>; // 1 / 84 ns = 12ish MHz 
         };*/
+
+	sound {
+		compatible = "fsl,imx28-evk-sgtl5000",
+			"fsl,mxs-audio-sgtl5000";
+		model = "imx28-evk-sgtl5000";
+		saif-controllers = <&saif0 &saif1>;
+		audio-codec = <&sgtl5000>;
+	};
 
 	backlight {
 		compatible = "pwm-backlight";
