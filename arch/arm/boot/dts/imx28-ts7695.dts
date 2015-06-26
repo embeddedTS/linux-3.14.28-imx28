@@ -22,6 +22,8 @@
 	aliases {
 		mmc0 = &ssp0;
 		mmc2 = &ssp1;
+		i2c0 = &i2c0;
+		i2c1 = &i2c1_gpio;
 	};
 
 	memory {
