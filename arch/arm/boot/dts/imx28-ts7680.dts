@@ -15,8 +15,16 @@
 #include <dt-bindings/interrupt-controller/irq.h>
 
 / {
+
 	model = "Technologic Systems i.MX28 TS-7680 (Default Device Tree)";
 	compatible = "fsl,imx28-ts7680", "fsl,imx28";
+
+	aliases {
+		mmc0 = &ssp0;
+		mmc2 = &ssp1;
+		i2c0 = &i2c0;
+		i2c1 = &i2c1_gpio;
+	};
 
 	memory {
 		reg = <0x40000000 0x08000000>;   /* 128MB */
@@ -25,46 +33,25 @@
 	apb@80000000 {
 		apbh@80000000 {
 		
-			gpmi-nand@8000c000 {
-				#address-cells = <1>;
-				#size-cells = <1>;
-				pinctrl-names = "default";
-				pinctrl-0 = <&gpmi_pins_ts7680 &gpmi_status_cfg_ts7680>;
-				status = "okay";
-
-				partition@0 {
-					label = "bootloader";
-					reg = <0x00000000 0x01400000>;
-				};
-
-				partition@1 {
-					label = "tspart";
-					reg = <0x01400000 0x01400000>;
-				};
-
-				partition@2 {
-					label = "filesystem";
-					reg = <0x02800000 0x7D800000>;
-				};
-			};
-	   
-			
 			ssp0: ssp@80010000 {
 				compatible = "fsl,imx28-mmc";
-				#address-cells = <1>;
-				#size-cells = <0>;
-				reg = <0x80010000 0x2000>;
-				interrupts = <96>;
-				clocks = <&clks 46>;
-				dmas = <&dma_apbh 0>;
-				dma-names = "rx-tx";
 				pinctrl-names = "default";
-				pinctrl-0 = <&mmc0_4bit_pins_ts7680					     
+				pinctrl-0 = <&mmc0_4bit_pins_ts7680
 					     &mmc0_sck_cfg
 					     &en_sd_pwr>;
 				broken-cd = <1>;	     
 				bus-width = <4>;
-				wp-gpios = <&gpio3 10 0>;
+				vmmc-supply = <&reg_vddio_sd0>;
+				status = "okay";
+			};
+
+			ssp1: ssp@80012000 {
+				compatible = "fsl,imx28-mmc";
+				pinctrl-names = "default";
+				pinctrl-0 = <&mmc1_4bit_pins
+					     &en_sd_pwr>;
+				broken-cd = <1>;	     
+				bus-width = <4>;
 				vmmc-supply = <&reg_vddio_sd0>;
 				status = "okay";
 			};
@@ -73,15 +60,45 @@
 				compatible = "fsl,imx28-mmc";
 				max-frequency = <26000000>;
 				pinctrl-names = "default";
-				pinctrl-0 = <&mmc1_4bit_pins_ts7680 
-				            &mmc_sck_cfg 
-				            &wifi_irq>;
+				pinctrl-0 = <&mmc2_4bit_pins
+				            &mmc_sck_cfg>;
 				broken-cd = <1>;				
 				cap-sdio-irq;
 				non-removable;
 				bus-width = <4>;
 				vmmc-supply = <&wl12xx_vmmc>;
 				status = "okay";
+			};
+
+			ssp3: ssp@80016000 {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				compatible = "fsl,imx28-spi";
+				pinctrl-names = "default";
+				pinctrl-0 = <&spi3_pins_b>;
+				status = "okay";
+
+				touch: tsc2046@0 {
+					compatible = "ti,tsc2046";
+					reg = <0>;
+					interrupt-parent = <&gpio0>;
+					interrupts = <6 2>;
+					spi-max-frequency = <2000000>;
+					pendown-gpio = <&gpio0 6 0>;
+					ti,penirq-recheck-delay-usecs = /bits/ 16 <5000>;
+					ti,vref-mv = <3300>;
+					ti,swap-xy;
+					ti,keep-vref-on;
+					ti,settle-delay-usec = /bits/ 16 <5000>;
+					ti,vref-delay-usecs = /bits/ 16 <0>;
+					ti,x-plate-ohms = /bits/ 16 <715>;
+					ti,y-plate-ohms = /bits/ 16 <325>;
+					ti,debounce-rep = /bits/ 16 <3>;
+					ti,debounce-tol = /bits/ 16 <65535>;
+					ti,debounce-max = /bits/ 16 <0>;
+					ti,pendown-gpio-debounce = <100000>;
+					linux,wakeup;
+				};
 			};
 			
 			
@@ -96,7 +113,23 @@
 					fsl,voltage = <MXS_VOLTAGE_HIGH>;
 					fsl,pull-up = <MXS_PULL_DISABLE>;				   
 				};
-								
+
+				/* XXX: some of these are in GPIO mode still */
+				spi3_pins_b: ts7695touchpins {
+					reg = <0>;
+					fsl,pinmux-ids = <
+						MX28_PAD_GPMI_RDN__SSP3_SCK
+						MX28_PAD_GPMI_RESETN__SSP3_CMD
+						MX28_PAD_GPMI_CE0N__SSP3_D0
+						MX28_PAD_GPMI_CE1N__SSP3_D3
+						MX28_PAD_GPMI_ALE__SSP3_D1
+						MX28_PAD_GPMI_CLE__SSP3_D2
+					>;
+					fsl,drive-strength = <MXS_DRIVE_8mA>;
+					fsl,voltage = <MXS_VOLTAGE_HIGH>;
+					fsl,pull-up = <MXS_PULL_DISABLE>;
+				};
+
 				mmc0_4bit_pins_ts7680: mmc0-4bit@0 {
 					reg = <0>;
 					fsl,pinmux-ids = <
@@ -111,12 +144,28 @@
 					fsl,voltage = <MXS_VOLTAGE_HIGH>;
 					fsl,pull-up = <MXS_PULL_ENABLE>;
 				};
-				
-				mmc1_4bit_pins_ts7680: mmc1-4bit@0 {   /* wifi */
+
+				mmc1_4bit_pins: mmc1-4bit@0 {
 					reg = <0>;
 					fsl,pinmux-ids = <
-					   MX28_PAD_SSP0_DATA4__SSP2_D0
-					   MX28_PAD_SSP2_SS1__SSP2_D1
+						MX28_PAD_GPMI_WRN__SSP1_SCK
+
+						MX28_PAD_GPMI_RDY1__SSP1_CMD
+						MX28_PAD_GPMI_D00__SSP1_D0
+						MX28_PAD_GPMI_D01__SSP1_D1
+						MX28_PAD_GPMI_D02__SSP1_D2
+						MX28_PAD_GPMI_D03__SSP1_D3
+					>;
+					fsl,drive-strength = <MXS_DRIVE_8mA>;
+					fsl,voltage = <MXS_VOLTAGE_HIGH>;
+					fsl,pull-up = <MXS_PULL_ENABLE>;
+				};
+				
+				mmc2_4bit_pins: mmc2-4bit@0 {   /* wifi */
+					reg = <0>;
+					fsl,pinmux-ids = <
+						MX28_PAD_SSP0_DATA4__SSP2_D0
+						MX28_PAD_SSP2_SS1__SSP2_D1
 						MX28_PAD_SSP2_SS2__SSP2_D2
 						MX28_PAD_SSP0_DATA5__SSP2_D3
 						MX28_PAD_SSP0_DATA6__SSP2_CMD
@@ -128,60 +177,12 @@
 					fsl,pull-up = <MXS_PULL_ENABLE>;
 				};
 
-				
-				wifi_irq: wifi-irq {									
-					fsl,pinmux-ids = <					   
-						MX28_PAD_LCD_D22__GPIO_1_22
-					>;
-					fsl,drive-strength = <MXS_DRIVE_8mA>;
-					fsl,pull-up = <MXS_PULL_ENABLE>;
-				};
-
 				mmc_sck_cfg: mmc-sck-cfg {
 					fsl,pinmux-ids = <
 						MX28_PAD_SSP0_DATA7__SSP2_SCK
 					>;
 					fsl,drive-strength = <MXS_DRIVE_12mA>;
 					fsl,pull-up = <MXS_PULL_DISABLE>;
-				};
-				
-								
-				gpmi_pins_ts7680: gpmi-nand-ts7680@0 {
-					reg = <0>;
-					fsl,pinmux-ids = <
-						MX28_PAD_GPMI_D00__GPMI_D0
-						MX28_PAD_GPMI_D01__GPMI_D1
-						MX28_PAD_GPMI_D02__GPMI_D2
-						MX28_PAD_GPMI_D03__GPMI_D3
-						MX28_PAD_GPMI_D04__GPMI_D4
-						MX28_PAD_GPMI_D05__GPMI_D5
-						MX28_PAD_GPMI_D06__GPMI_D6
-						MX28_PAD_GPMI_D07__GPMI_D7
-						MX28_PAD_GPMI_CE0N__GPMI_CE0N
-						MX28_PAD_GPMI_RDY0__GPMI_READY0
-						MX28_PAD_GPMI_RDN__GPMI_RDN
-						MX28_PAD_GPMI_WRN__GPMI_WRN
-						MX28_PAD_GPMI_ALE__GPMI_ALE
-						MX28_PAD_GPMI_CLE__SSP3_D2
-						MX28_PAD_GPMI_CLE__GPMI_CLE
-						MX28_PAD_GPMI_RDY1__GPIO_0_21      /* NC */
-						MX28_PAD_GPMI_CE1N__GPIO_0_17      /* RED_LED# */
-						MX28_PAD_GPMI_RESETN__GPIO_0_28    /* GREEN_LED# */
-					>;
-					fsl,drive-strength = <MXS_DRIVE_4mA>;
-					fsl,voltage = <MXS_VOLTAGE_HIGH>;
-					fsl,pull-up = <MXS_PULL_ENABLE>;
-				};
-				
-				gpmi_status_cfg_ts7680: gpmi-status-cfg-ts7680 {
-					fsl,pinmux-ids = <
-						MX28_PAD_GPMI_RDN__GPMI_RDN
-						MX28_PAD_GPMI_WRN__GPMI_WRN						
-						MX28_PAD_GPMI_CE1N__GPIO_0_17      /* RED_LED# */
-						MX28_PAD_GPMI_RESETN__GPIO_0_28    /* GREEN_LED# */
-					>;
-					
-					fsl,drive-strength = <MXS_DRIVE_12mA>;
 				};
 				
 				mac0_pins_ts7680: mac0@0 {
@@ -196,7 +197,7 @@
 					   MX28_PAD_ENET0_TXD0__ENET0_TXD0
 					   MX28_PAD_ENET0_TXD1__ENET0_TXD1
 					   MX28_PAD_ENET_CLK__CLKCTRL_ENET
-					   MX28_PAD_SSP0_DETECT__GPIO_2_9   // ETH_RESET#
+					   //MX28_PAD_SSP0_DETECT__GPIO_2_9   // ETH_RESET#
 					>;
 					fsl,drive-strength = <MXS_DRIVE_8mA>;
 					fsl,voltage = <MXS_VOLTAGE_HIGH>;
@@ -260,9 +261,7 @@
 				pinctrl-0 = <&can1_pins_a>;
 				status = "okay";
 			};
-			
-			
-			
+
 		};
 
 		apbx@80040000 {
@@ -286,9 +285,16 @@
 				clock-frequency = <100000>;
 				status = "okay";
 
-				rtc: isl12020@6f {
-				compatible = "isl,isl12020";
-				reg = <0x6f>;
+				rtc: m41t00s@68 {
+					compatible = "m41t00";
+					reg = <0x68>;
+				};
+
+				gpio8: ts7680gpio@28 {
+				   compatible = "ts76xxgpio";
+				   reg = <0x28>;   
+				   #gpio-cells = <2>;
+				   gpio-controller;
 				};
 
 				cortexM0: cortextm0@78 {
@@ -312,18 +318,6 @@
 				pinctrl-0 = <&i2c1_gpio_pins>;
 				status = "okay";
 				
-				eeprom: eeprom@51 {
-				   compatible = "at,24c08";
-				   reg = <0x51>;
-				   pagesize = <16>;
-				};
-						
-				gpio8: ts7680gpio@28 {
-				   compatible = "ts76xxgpio";
-				   reg = <0x28>;   
-				   #gpio-cells = <2>;
-				   gpio-controller;
-				};
 			};
 			
 			duart: serial@80074000 {
@@ -369,12 +363,12 @@
 			auart4: serial@80072000 {
 				pinctrl-names = "default";
 				pinctrl-0 = <&auart4_pins>;
-				status = "okay";
+				status = "disabled";
 			};
 
 			pwm: pwm@80064000 {
 				pinctrl-names = "default";
-				pinctrl-0 = <&pwm4_pins_a>;
+				pinctrl-0 = <&pwm2_pins_a>;
 				status = "okay";
 			};
 		};
@@ -457,15 +451,39 @@
 			regulator-boot-on;
 		};
 
+		reg_lcd_3v3: lcd-3v3 {
+			compatible = "regulator-fixed";
+			regulator-name = "lcd-3v3";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			gpio = <&gpio3 30 0>;
+			enable-active-high;
+		};
+
 
 	};
 	
 	wlan  {
-      compatible = "ti,wilink8";		
+		compatible = "ti,wilink8";		
 		interrupt-parent = <&gpio1>;		
 		interrupts = <22 IRQ_TYPE_EDGE_FALLING>;
 		interrupt-names = "wlan";
 		status = "okay";
+	};
+
+	/*fpga_clock {
+		compatible = "pwm-clock";
+		#clock-cells = <0>;
+		clock-frequency = <12000000>;
+		clock-output-names = "fpga_12mhz";
+                pwms = <&pwm 2 84>; // 1 / 84 ns = 12ish MHz 
+        };*/
+
+	backlight {
+		compatible = "pwm-backlight";
+		pwms = <&pwm 2 84>;
+		brightness-levels = <0 4 8 16 32 64 128 255>;
+		default-brightness-level = <6>;
 	};
 				
 };
