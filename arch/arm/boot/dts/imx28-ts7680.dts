@@ -388,7 +388,7 @@
 			pinctrl-0 = <&mac0_pins_ts7680>;			      
 			clocks = <&clks 57>, <&clks 57>, <&clks 64>;
 			clock-names = "ipg", "ahb", "enet_out";
-			phy-reset-gpios = <&gpio2 9 GPIO_ACTIVE_LOW>;
+			phy-reset-gpios = <&gpio8 43 GPIO_ACTIVE_LOW>;
 			phy-reset-duration = <1000>;
 			status = "okay";
 
