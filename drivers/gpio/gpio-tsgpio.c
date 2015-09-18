@@ -9,7 +9,7 @@
 #include <linux/of_gpio.h>
 #include <linux/of_device.h>
 #include <linux/i2c.h>
-#include <linux/i2c/ts76xxgpio.h>
+#include <linux/i2c/tsgpio.h>
 
 
 struct gpio_ts_priv {
@@ -90,6 +90,7 @@ static inline int gpio_ts_read(struct i2c_client *client, u16 addr)
 static int ts_set_gpio_direction(struct i2c_client *client,
 	int gpio, int is_input)
 {
+	struct tsgpio_platform_data *pdata = client->dev.platform_data;
 	u8 reg;
 
 	dev_dbg(&client->dev, "%s setting gpio %d to is_input=%d\n", 
@@ -97,8 +98,28 @@ static int ts_set_gpio_direction(struct i2c_client *client,
 	
 	reg = gpio_ts_read(client, gpio);
 
-	if(is_input) reg &= 0x6;
-	else reg |= 0x1;
+	if(pdata->twobit) {
+		if(is_input) {
+			reg = 0x0; /* can safely clear the whole reg in this case */
+		} else {
+			/* Since this board doesn't have seperate input/output
+			* data regs, initialize to the last output value if
+			* it has beenset before, or start with 0 on first
+			* use */
+			int oldval = (pdata->bank >> gpio) & 0x1;
+			reg |= (TSGPIO_OE | (oldval << 1));
+		}
+	} else {
+		if(is_input) {
+			reg &= TSGPIO_OD;
+		} else {
+			reg |= TSGPIO_OE;
+			/* clear other bits because a write of 0 to the upper bits
+			 * keeps the output in its current state. If we read then 
+			 * write it back we have a race condition on our hands */
+			reg &= (TSGPIO_OD | TSGPIO_OE);
+		}
+	}
 
 	gpio_ts_write(client, gpio, reg);
 
@@ -107,6 +128,7 @@ static int ts_set_gpio_direction(struct i2c_client *client,
 
 static int ts_set_gpio_dataout(struct i2c_client *client, int gpio, int enable)
 {
+	struct tsgpio_platform_data *pdata = client->dev.platform_data;
 	u8 reg;
 
 	dev_dbg(&client->dev, "%s setting gpio %d to output=%d\n", 
@@ -114,15 +136,28 @@ static int ts_set_gpio_dataout(struct i2c_client *client, int gpio, int enable)
 
 	reg = gpio_ts_read(client, gpio);
 
-	if(enable) reg |= 0x2;
-	else reg &= 0x5;
+	WARN_ON(pdata == NULL);
+
+	if(enable) {
+		pdata->bank |= (1 << gpio);
+		reg |= TSGPIO_OD; /* set data output bit */
+		/* clear other bits because a write of 0 to the upper bits
+		 * keeps the output in its current state. If we read then 
+		 * write it back we have a race condition on our hands */
+		reg &= (TSGPIO_OD | TSGPIO_OE); 
+	} else {
+		pdata->bank &= ~(1 << gpio);
+		reg &= TSGPIO_OE;
+	}
 
 	return gpio_ts_write(client, gpio, reg);
 }
 
 static int ts_get_gpio_datain(struct i2c_client *client, int gpio)
 {
+	struct tsgpio_platform_data *pdata = client->dev.platform_data;
 	u8 reg, addr;
+	int ret;
 	
 	dev_dbg(&client->dev, "%s Getting GPIO %d Input\n", __func__, gpio);
 
@@ -130,7 +165,13 @@ static int ts_get_gpio_datain(struct i2c_client *client, int gpio)
 
 	reg = gpio_ts_read(client, addr);
 
-	return ((reg & 0x4) ? 1 : 0);
+	if(pdata->twobit) {
+		ret = (reg & TSGPIO_OD) ? 1 : 0;
+	} else {
+		ret = (reg & TSGPIO_ID) ? 1 : 0;
+	}
+
+	return ret;
 }
 
 static int ts_direction_in(struct gpio_chip *chip, unsigned offset)
@@ -205,16 +246,17 @@ static int gpio_ts_remove(struct i2c_client *client)
 
 
 #ifdef CONFIG_OF
-static const struct of_device_id ts76xxgpio_ids[] = {
-        { .compatible = "ts76xxgpio", },
+static const struct of_device_id tsgpio_ids[] = {
+        { .compatible = "tsgpio", .data = (void *) 0},
+        { .compatible = "tsgpio-2bitio", .data = (void *) 1},
         {},
 };
 
-MODULE_DEVICE_TABLE(of, ts76xxgpio_ids);
+MODULE_DEVICE_TABLE(of, tsgpio_ids);
 
-static const struct ts76xxgpio_platform_data *ts76xxgpio_probe_dt(struct device *dev)
+static struct tsgpio_platform_data *tsgpio_probe_dt(struct device *dev)
 {
-	struct ts76xxgpio_platform_data *pdata;
+	struct tsgpio_platform_data *pdata;
 	struct device_node *node = dev->of_node;
 	const struct of_device_id *match;
 
@@ -223,7 +265,7 @@ static const struct ts76xxgpio_platform_data *ts76xxgpio_probe_dt(struct device 
 		return ERR_PTR(-EINVAL);
 	}
 
-	match = of_match_device(ts76xxgpio_ids, dev);
+	match = of_match_device(tsgpio_ids, dev);
 	if (!match) {
 		dev_err(dev, "Unknown device model\n");
 		return ERR_PTR(-EINVAL);
@@ -232,13 +274,13 @@ static const struct ts76xxgpio_platform_data *ts76xxgpio_probe_dt(struct device 
 	pdata = devm_kzalloc(dev, sizeof(*pdata), GFP_KERNEL);
 	if (!pdata)
 		return ERR_PTR(-ENOMEM);
-		
-	pdata->wl_en = of_property_read_bool(node, "wl_en");
+
+	pdata->twobit = (unsigned long)match->data;		
 	
 	return pdata;
 }
 #else
-static const struct ts76xxgpio_platform_data *ts76xxgpio_probe_dt(struct device *dev)
+static struct tsgpio_platform_data *tsgpio_probe_dt(struct device *dev)
 {
 	dev_err(dev, "no platform data defined\n");
 	return ERR_PTR(-EINVAL);
@@ -249,7 +291,7 @@ static int gpio_ts_probe(struct i2c_client *client,
                          const struct i2c_device_id *id)
 {
 	struct gpio_ts_priv *priv;
-	const struct ts76xxgpio_platform_data *pdata;
+	struct tsgpio_platform_data *pdata;
 	
 	int ret;
 
@@ -259,10 +301,11 @@ static int gpio_ts_probe(struct i2c_client *client,
 
 	pdata = dev_get_platdata(&client->dev);
 	if (!pdata) {
-		pdata = ts76xxgpio_probe_dt(&client->dev);
+		pdata = tsgpio_probe_dt(&client->dev);
 		if (IS_ERR(pdata))
 			return PTR_ERR(pdata);
 	}		
+	client->dev.platform_data = pdata;
 		
 	priv = devm_kzalloc(&client->dev, sizeof(struct gpio_ts_priv), GFP_KERNEL);
 	if (!priv)
@@ -272,7 +315,7 @@ static int gpio_ts_probe(struct i2c_client *client,
 	priv->client = client;
 	priv->gpio_chip = template_chip;
 	priv->gpio_chip.base = -1;
-	priv->gpio_chip.ngpio = 46;
+	priv->gpio_chip.ngpio = 64;
 	priv->gpio_chip.label = "tsgpio";
 	priv->gpio_chip.dev = &client->dev;
 
@@ -286,16 +329,11 @@ static int gpio_ts_probe(struct i2c_client *client,
 		priv->gpio_chip.ngpio = 0;
 	}
 	
-	if(pdata->wl_en) {
-		printk(KERN_INFO "wl_en...where?\n");
-
-	}
-	
 	return ret;
 }
 
 static const struct i2c_device_id tsgpio_id[] = {
-	{ "ts76xxgpio", 0 },
+	{ "tsgpio", 0 },
 	{ }
 };
 MODULE_DEVICE_TABLE(i2c, tsgpio_id);
@@ -304,10 +342,10 @@ MODULE_ALIAS("platform:tsgpio");
 
 static struct i2c_driver gpio_ts_driver = {
 	.driver = {
-		.name	= "ts76xxgpio",
+		.name	= "tsgpio",
 		.owner	= THIS_MODULE,
 #ifdef CONFIG_OF
-		.of_match_table = of_match_ptr(ts76xxgpio_ids),
+		.of_match_table = of_match_ptr(tsgpio_ids),
 #endif
 	},
 	.probe		= gpio_ts_probe,

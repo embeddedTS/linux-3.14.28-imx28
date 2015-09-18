@@ -291,7 +291,7 @@
 				};
 
 				gpio8: ts7680gpio@28 {
-				   compatible = "ts76xxgpio";
+				   compatible = "tsgpio-2bitio";
 				   reg = <0x28>;   
 				   #gpio-cells = <2>;
 				   gpio-controller;
