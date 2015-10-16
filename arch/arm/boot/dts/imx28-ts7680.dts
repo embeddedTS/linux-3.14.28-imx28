@@ -291,15 +291,15 @@
 				};
 
 				gpio8: ts7680gpio@28 {
-				   compatible = "tsgpio-2bitio";
-				   reg = <0x28>;   
-				   #gpio-cells = <2>;
-				   gpio-controller;
+					compatible = "tsgpio-2bitio";
+					reg = <0x28>;   
+					#gpio-cells = <2>;
+					gpio-controller;
 				};
 
-				cortexM0: cortextm0@78 {
-				compatible = "ts7680,m0";
-				reg = <0x78>;				
+				silabs: silabs@78 {
+					compatible = "ts-reboot";
+					reg = <0x78>;
 				};
 		   };
 
