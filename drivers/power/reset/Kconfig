@@ -20,13 +20,6 @@ config POWER_RESET_GPIO
 	  If your board needs a GPIO high/low to power down, say Y and
 	  create a binding in your devicetree.
 
-config POWER_RESET_TSSILABS
-	bool "TS reset driver"
-	depends on POWER_RESET
-	help
-	  Causes a POR by writing to the supervisor microcontroller on some 
-	  Technologic Systems boards
-
 config POWER_RESET_MSM
 	bool "Qualcomm MSM power-off driver"
 	depends on POWER_RESET && ARCH_MSM
