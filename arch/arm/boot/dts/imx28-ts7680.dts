@@ -268,14 +268,14 @@
 			saif0: saif@80042000 {
 				pinctrl-names = "default";
 				pinctrl-0 = <&saif0_pins_a>;
-				status = "okay";
+				status = "disabled";
 			};
 
 			saif1: saif@80046000 {
 				pinctrl-names = "default";
 				pinctrl-0 = <&saif1_pins_a>;
 				fsl,saif-master = <&saif0>;
-				status = "okay";
+				status = "disabled";
 			};
 
 
@@ -363,7 +363,7 @@
 			auart4: serial@80072000 {
 				pinctrl-names = "default";
 				pinctrl-0 = <&auart4_pins>;
-				status = "disabled";
+				status = "okay";
 			};
 
 			pwm: pwm@80064000 {
