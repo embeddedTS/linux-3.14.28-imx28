@@ -388,6 +388,7 @@
 			pinctrl-0 = <&mac0_pins_ts7680>;			      
 			clocks = <&clks 57>, <&clks 57>, <&clks 64>;
 			clock-names = "ipg", "ahb", "enet_out";
+		 	phy-supply = <&phy_dummy_vbus>;		
 			phy-reset-gpios = <&gpio8 43 GPIO_ACTIVE_LOW>;
 			phy-reset-duration = <1000>;
 			status = "okay";
@@ -458,6 +459,13 @@
 			regulator-max-microvolt = <3300000>;
 			gpio = <&gpio3 30 0>;
 			enable-active-high;
+		};
+
+		phy_dummy_vbus: phy_dummy_vbus {		
+			compatible = "regulator-dummy";
+			regulator-name = "phy-dummy";
+			enable-active-high;
+			regulator-boot-on;
 		};
 
 
