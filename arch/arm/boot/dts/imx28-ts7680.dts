@@ -314,9 +314,9 @@
 			   i2c-gpio,timeout-ms = <500>; 
 			   #address-cells = <1>;
 			   #size-cells = <0>;			   
-				pinctrl-names = "default";
-				pinctrl-0 = <&i2c1_gpio_pins>;
-				status = "okay";
+			   pinctrl-names = "default";
+			   pinctrl-0 = <&i2c1_gpio_pins>;
+			   status = "disabled";
 				
 			};
 			
