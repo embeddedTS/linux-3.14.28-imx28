@@ -298,7 +298,7 @@
 				};
 
 				silabs: silabs@78 {
-					compatible = "ts-reboot";
+					compatible = "ts-wdt";
 					reg = <0x78>;
 				};
 		   };

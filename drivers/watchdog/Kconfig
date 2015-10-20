@@ -348,6 +348,14 @@ config NUC900_WATCHDOG
 	  To compile this driver as a module, choose M here: the
 	  module will be called nuc900_wdt.
 
+config TS_WDT_MICRO
+	tristate "Technologic Microcontroller Watchdog"
+	depends on ARM
+	select WATCHDOG_CORE
+	help
+	  Hardware driver for the Technologic Systems silabs based 
+	  microcontroller watchdog
+
 config TS72XX_WATCHDOG
 	tristate "TS-72XX SBC Watchdog"
 	depends on MACH_TS72XX
