@@ -23,7 +23,7 @@
 
 #define TS_DEFAULT_TIMEOUT 30
 
-static bool nowayout = 0;
+static bool nowayout = WATCHDOG_NOWAYOUT;
 
 struct ts_wdt_dev {
 	struct device		*dev;
@@ -102,7 +102,7 @@ static int ts_wdt_start(struct watchdog_device *wdt)
 static int ts_wdt_stop(struct watchdog_device *wdt)
 {
 	dev_dbg(&client->dev, "%s\n", __func__);
-	return ts_wdt_write(0);
+	return ts_wdt_write(3);
 }
 
 static void do_ts_reboot(enum reboot_mode reboot_mode, const char *cmd)
@@ -114,6 +114,18 @@ static void do_ts_reboot(enum reboot_mode reboot_mode, const char *cmd)
 
 	spin_lock_irqsave(&wdt_lock, flags);
 	ts_wdt_write(0);
+	while (1);
+}
+
+static void do_ts_halt(enum reboot_mode reboot_mode, const char *cmd)
+{
+	unsigned long flags;
+	static DEFINE_SPINLOCK(wdt_lock);
+
+	dev_dbg(&client->dev, "%s\n", __func__);
+
+	spin_lock_irqsave(&wdt_lock, flags);
+	ts_wdt_write(3);
 	while (1);
 }
 
@@ -134,7 +146,8 @@ static void ts_wdt_ping_work(struct work_struct *work)
 }
 
 static struct watchdog_info ts_wdt_ident = {
-	.options	= WDIOF_SETTIMEOUT | WDIOF_KEEPALIVEPING,
+	.options	= WDIOF_SETTIMEOUT | WDIOF_KEEPALIVEPING | 
+				WDIOF_MAGICCLOSE,
 	.identity	= "Technologic Micro Watchdog",
 };
 
@@ -165,6 +178,7 @@ static int tsreboot_probe(struct i2c_client *c,
 		return -ENOMEM;
 
 	arm_pm_restart = do_ts_reboot;
+	pm_power_off = do_ts_halt;
 	dev_dbg(&client->dev, "%s\n", __func__);
 
 	watchdog_set_drvdata(&ts_wdt_wdd, wdev);
@@ -176,10 +190,7 @@ static int tsreboot_probe(struct i2c_client *c,
 	if (err)
 		return err;
 
-	if (nowayout)
-		ts_wdt_write(300);
-	else
-		ts_wdt_ping_enable(wdev);
+	ts_wdt_ping_enable(wdev);
 
 	return 0;
 }
