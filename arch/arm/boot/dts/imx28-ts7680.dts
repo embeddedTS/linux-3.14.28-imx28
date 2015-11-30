@@ -436,7 +436,7 @@
 			regulator-name = "usb1_vbus";
 			regulator-min-microvolt = <5000000>;
 			regulator-max-microvolt = <5000000>;
-			gpio = <&gpio3 13 0>;
+			gpio = <&gpio1 27 0>;
 			regulator-always-on;
 		};
 		
