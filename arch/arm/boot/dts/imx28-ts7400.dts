@@ -301,7 +301,12 @@
 		};
 	};
 
-	ahb@80080000 {	   
+	ahb@80080000 {
+	
+	   usb0: usb@80080000 {
+		   status = "okay";
+	   };
+	
 		usb1: usb@80090000 {
 			vbus-supply = <&reg_usb1_vbus>;		
 			disable-over-current;
@@ -347,16 +352,7 @@
 			enable-active-low;
 			gpio = <&gpio3 28 0>;      // EN_SD_PWR#
 			};
-
-		reg_usb0_vbus: usb0_vbus {
-			compatible = "regulator-fixed";
-			regulator-name = "usb0_vbus";
-			regulator-min-microvolt = <5000000>;
-			regulator-max-microvolt = <5000000>;
-			gpio = <&gpio3 12 0>;
-			
-		};
-
+		
 		reg_usb1_vbus: usb1_vbus {
 			compatible = "regulator-fixed";
 			regulator-name = "usb1_vbus";
