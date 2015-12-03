@@ -21,6 +21,7 @@
 
 	aliases {
 		mmc0 = &ssp0;
+		mmc2 = &ssp1;
 		i2c0 = &i2c0;
 		i2c1 = &i2c1_gpio;
 	};
@@ -217,9 +218,9 @@
 				clock-frequency = <100000>;
 				status = "okay";
 
-				rtc: m41t00s@68 {
-					compatible = "m41t00";
-					reg = <0x68>;
+				rtc: isl12020@68 {
+					compatible = "isl,isl12020";
+					reg = <0x6f>;
 				};
 
 				silabs: silabs@78 {
