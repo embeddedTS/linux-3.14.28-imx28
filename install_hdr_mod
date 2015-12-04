@@ -26,23 +26,5 @@ sudo mount /dev/$1 mount_point/ &&\
   fi
 ) &&\
 
-(
-  echo "Copying U-Boot kernel to device $1"
-  sudo -E cp arch/arm/boot/uImage mount_point/boot
-  if [ $? -ne "0" ] ; then
-    echo "Failed to failed to copy U-Boot kernel to device $1"
-    exit 1
-  fi
-) && \
-
-(
-  echo "Copying device-tree to device $1"
-  sudo -E cp arch/arm/boot/dts/imx28-ts*.dtb mount_point/boot
-  if [ $? -ne "0" ] ; then
-    echo "Failed to failed to copy device-tree to device $1"
-    exit 1
-  fi
-) && \
-
 sudo umount mount_point
 rmdir mount_point
