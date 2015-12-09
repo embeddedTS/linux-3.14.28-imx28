@@ -19,12 +19,14 @@
 	model = "Technologic Systems i.MX28 TS-7670 (Default Device Tree)";
 	compatible = "fsl,imx28-ts7670", "fsl,imx28";
 
-	aliases {
-		mmc0 = &ssp0;
-		mmc2 = &ssp1;
-		i2c0 = &i2c0;
-		i2c1 = &i2c1_gpio;
-	};
+   aliases {
+      mmc0 = &ssp0;
+      mmc2 = &ssp1;
+      i2c0 = &i2c0;
+      i2c1 = &i2c1_gpio;
+      can0 = &can0;
+      can1 = &can1;
+   };
 
 	memory {
 		reg = <0x40000000 0x08000000>;   /* 128MB */
@@ -182,7 +184,7 @@
 					fsl,pull-up = <MXS_PULL_DISABLE>;
 				};
 				
-				can_enable_pins_: can0@0 {
+				can_enable_pins: can0_en_pin@0 {
 				   reg = <0>;
 					fsl,pinmux-ids = <
 						MX28_PAD_LCD_RESET__GPIO_3_30   // EN_CAN#
@@ -196,7 +198,7 @@
 			can0: can@80032000 {
 				pinctrl-names = "default";
 				pinctrl-0 = <&can0_pins_a
-				   &can_enable_pins_>;
+				   &can_enable_pins>;
 				xceiver-supply = <&reg_can_3v3>;   
 				status = "okay";
 			};
