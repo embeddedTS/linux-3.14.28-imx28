@@ -16,8 +16,8 @@
 
 / {
 
-	model = "Technologic Systems i.MX28 TS-7680 (Default Device Tree)";
-	compatible = "fsl,imx28-ts7680", "fsl,imx28";
+	model = "Technologic Systems i.MX28 TS-7690 (Default Device Tree)";
+	compatible = "fsl,imx28-ts7690", "fsl,imx28";
 
 	aliases {
 		mmc0 = &ssp0;
@@ -36,7 +36,7 @@
 			ssp0: ssp@80010000 {
 				compatible = "fsl,imx28-mmc";
 				pinctrl-names = "default";
-				pinctrl-0 = <&mmc0_4bit_pins_ts7680
+				pinctrl-0 = <&mmc0_4bit_pins_ts7690
 					     &mmc0_sck_cfg
 					     &en_sd_pwr>;
 				broken-cd = <1>;	     
@@ -115,7 +115,7 @@
 					fsl,pull-up = <MXS_PULL_DISABLE>;				   
 				};
 
-				ts7695_lcdif_pins: ts7695_lcdif_pins {
+				ts7690_lcdif_pins: ts7690_lcdif_pins {
 					reg = <0>;
 					fsl,pinmux-ids = <
 						MX28_PAD_LCD_D01__LCD_D1
@@ -148,7 +148,7 @@
 				};
 
 				/* XXX: some of these are in GPIO mode still */
-				spi3_pins_b: ts7695touchpins {
+				spi3_pins_b: ts7690touchpins {
 					reg = <0>;
 					fsl,pinmux-ids = <
 						MX28_PAD_GPMI_RDN__SSP3_SCK
@@ -163,7 +163,7 @@
 					fsl,pull-up = <MXS_PULL_DISABLE>;
 				};
 
-				mmc0_4bit_pins_ts7680: mmc0-4bit@0 {
+				mmc0_4bit_pins_ts7690: mmc0-4bit@0 {
 					reg = <0>;
 					fsl,pinmux-ids = <
 						MX28_PAD_SSP0_DATA0__SSP0_D0
@@ -227,7 +227,7 @@
 					fsl,pull-up = <MXS_PULL_DISABLE>;
 				};
 				
-				mac0_pins_ts7680: mac0@0 {
+				mac0_pins_ts7690: mac0@0 {
 					reg = <0>;
 					fsl,pinmux-ids = <
 					   MX28_PAD_ENET0_MDC__GPIO_4_0
@@ -307,7 +307,7 @@
 			lcdif@80030000 {
 				compatible = "fsl,imx28-lcdif";
 				pinctrl-names = "default";
-				pinctrl-0 = <&ts7695_lcdif_pins>;
+				pinctrl-0 = <&ts7690_lcdif_pins>;
 				lcd-supply = <&reg_lcd_3v3>;
 				display = <&display>;
 				status = "okay";
@@ -373,7 +373,7 @@
 				};
 
 				cortexM0: cortextm0@78 {
-				compatible = "ts7680,m0";
+				compatible = "ts7690,m0";
 				reg = <0x78>;				
 				};
 		   };
@@ -399,7 +399,7 @@
 				   pagesize = <16>;
 				};
 						
-				gpio8: ts7680gpio@28 {
+				gpio8: ts7690gpio@28 {
 				   compatible = "ts76xxgpio";
 				   reg = <0x28>;   
 				   #gpio-cells = <2>;
@@ -472,7 +472,7 @@
 		mac0: ethernet@800f0000 {
 			phy-mode = "rmii";
 			pinctrl-names = "default";
-			pinctrl-0 = <&mac0_pins_ts7680>;			      
+			pinctrl-0 = <&mac0_pins_ts7690>;			      
 			clocks = <&clks 57>, <&clks 57>, <&clks 64>;
 			clock-names = "ipg", "ahb", "enet_out";
 			phy-reset-gpios = <&gpio2 9 GPIO_ACTIVE_LOW>;
