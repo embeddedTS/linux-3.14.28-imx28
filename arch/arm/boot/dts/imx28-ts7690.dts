@@ -430,7 +430,7 @@
 
 			pwm: pwm@80064000 {
 				pinctrl-names = "default";
-				pinctrl-0 = <&pwm2_pins_a>;
+				pinctrl-0 = <&pwm3_pins_a>;
 				status = "okay";
 			};
 		};
@@ -539,14 +539,6 @@
 		status = "okay";
 	};
 
-	/*fpga_clock {
-		compatible = "pwm-clock";
-		#clock-cells = <0>;
-		clock-frequency = <12000000>;
-		clock-output-names = "fpga_12mhz";
-                pwms = <&pwm 2 84>; // 1 / 84 ns = 12ish MHz 
-        };*/
-
 	sound {
 		compatible = "fsl,imx28-evk-sgtl5000",
 			"fsl,mxs-audio-sgtl5000";
@@ -557,10 +549,21 @@
 
 	backlight {
 		compatible = "pwm-backlight";
-		pwms = <&pwm 2 84>;
-		brightness-levels = <0 4 8 16 32 64 128 255>;
-		default-brightness-level = <6>;
+		pwms = <&pwm 3 5000000>;
+		brightness-levels = <0 1 2 4 8 16 32 64 128 255>;
+		default-brightness-level = <9>;
 	};
+
+	leds {
+		compatible = "gpio-leds";
+		backlight_en {
+			label = "backlight";
+			gpios = <&gpio8 79 GPIO_ACTIVE_HIGH>;
+			default-state = "on";
+			linux,default-trigger = "backlight";
+		};
+	};
+			
 				
 };
 
