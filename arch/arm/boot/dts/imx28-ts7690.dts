@@ -79,9 +79,9 @@
 				pinctrl-0 = <&spi3_pins_b>;
 				status = "okay";
 
-				touch: tsc2046@0 {
+				touch: tsc2046@2 {
 					compatible = "ti,tsc2046";
-					reg = <0>;
+					reg = <2>;
 					interrupt-parent = <&gpio0>;
 					interrupts = <6 2>;
 					spi-max-frequency = <2000000>;
@@ -90,14 +90,13 @@
 					ti,vref-mv = <3300>;
 					ti,swap-xy;
 					ti,keep-vref-on;
-					ti,settle-delay-usec = /bits/ 16 <5000>;
 					ti,vref-delay-usecs = /bits/ 16 <0>;
-					ti,x-plate-ohms = /bits/ 16 <715>;
-					ti,y-plate-ohms = /bits/ 16 <325>;
+					ti,x-plate-ohms = /bits/ 16 <400>;
+					ti,y-plate-ohms = /bits/ 16 <400>;
+					ti,debounce-max = /bits/ 16 <10>;
+					ti,debounce-tol = /bits/ 16 <3>;
 					ti,debounce-rep = /bits/ 16 <3>;
-					ti,debounce-tol = /bits/ 16 <65535>;
-					ti,debounce-max = /bits/ 16 <0>;
-					ti,pendown-gpio-debounce = <100000>;
+					ti,settle-delay-usec = /bits/ 16 <150>;
 					linux,wakeup;
 				};
 			};
