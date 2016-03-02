@@ -276,7 +276,11 @@ static struct tsgpio_platform_data *tsgpio_probe_dt(struct device *dev)
 		return ERR_PTR(-ENOMEM);
 
 	pdata->twobit = (unsigned long)match->data;		
-	
+
+	if(of_property_read_u16(node, "ngpio", &pdata->ngpio)) {
+		pdata->ngpio = 64;
+	}
+
 	return pdata;
 }
 #else
@@ -315,7 +319,7 @@ static int gpio_ts_probe(struct i2c_client *client,
 	priv->client = client;
 	priv->gpio_chip = template_chip;
 	priv->gpio_chip.base = -1;
-	priv->gpio_chip.ngpio = 128;
+	priv->gpio_chip.ngpio = pdata->ngpio;
 	priv->gpio_chip.label = "tsgpio";
 	priv->gpio_chip.dev = &client->dev;
 
