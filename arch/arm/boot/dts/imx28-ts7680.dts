@@ -247,6 +247,15 @@
 					fsl,voltage = <MXS_VOLTAGE_HIGH>;
 					fsl,pull-up = <MXS_PULL_DISABLE>;
 			  };
+			  misc_pins: misc@0 {
+			      reg = <0>;
+			      fsl,pinmux-ids = <
+				MX28_PAD_LCD_CS__GPIO_1_27 //USB 5V EN
+			      >;
+			      fsl,drive-strength = <MXS_DRIVE_4mA>;
+			      fsl,voltage = <MXS_VOLTAGE_HIGH>;
+			      fsl,pull-up = <MXS_PULL_ENABLE>;
+			  };
 
 			};
 			
@@ -377,8 +386,13 @@
 	};
 
 	ahb@80080000 {	   
+		usb0: usb@80080000 {
+			disable-over-current;
+			dr_mode = "host";
+			status = "okay";
+		};
+
 		usb1: usb@80090000 {
-			vbus-supply = <&reg_usb1_vbus>;		
 			disable-over-current;
 			dr_mode = "host";
 			status = "okay";
@@ -425,21 +439,15 @@
 	
 		
 		reg_usb0_vbus: usb0_vbus {
-			compatible = "regulator-fixed";
-			regulator-name = "usb0_vbus";
-			regulator-min-microvolt = <5000000>;
-			regulator-max-microvolt = <5000000>;
-			gpio = <&gpio3 12 0>;
+			compatible = "regulator-dummy";
+			regulator-name = "usb0_vbus_dummy";
+			regulator-always-on;
 			
 		};
 
 		reg_usb1_vbus: usb1_vbus {
-			compatible = "regulator-fixed";
-			regulator-name = "usb1_vbus";
-			regulator-min-microvolt = <5000000>;
-			regulator-max-microvolt = <5000000>;
-			gpio = <&gpio1 27 0>;
-			enable-active-high;
+			compatible = "regulator-dummy";
+			regulator-name = "usb1_vbus_dummy";
 			regulator-always-on;
 		};
 		
@@ -489,6 +497,14 @@
 		clock-output-names = "fpga_12mhz";
                 pwms = <&pwm 2 83>; // 1 / 84 ns = 12ish MHz 
         };
+	
+	gpio_setup {
+		compatible = "fsl,imx28-pinctrl";
+		pinctrl-names = "default";
+		pinctrl-0 = <
+			&misc_pins
+		>;
+	};
 };
 
 
