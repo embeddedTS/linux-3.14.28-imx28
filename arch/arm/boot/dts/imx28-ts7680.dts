@@ -251,6 +251,7 @@
 			      reg = <0>;
 			      fsl,pinmux-ids = <
 				MX28_PAD_LCD_CS__GPIO_1_27 //USB 5V EN
+				MX28_PAD_LCD_RESET__GPIO_3_30 //EN_CAN#
 			      >;
 			      fsl,drive-strength = <MXS_DRIVE_4mA>;
 			      fsl,voltage = <MXS_VOLTAGE_HIGH>;
@@ -461,15 +462,6 @@
 			startup-delay-us = <70000>;
 			enable-active-high;
 			regulator-boot-on;
-		};
-
-		reg_lcd_3v3: lcd-3v3 {
-			compatible = "regulator-fixed";
-			regulator-name = "lcd-3v3";
-			regulator-min-microvolt = <3300000>;
-			regulator-max-microvolt = <3300000>;
-			gpio = <&gpio3 30 0>;
-			enable-active-high;
 		};
 
 		phy_dummy_vbus: phy_dummy_vbus {		
