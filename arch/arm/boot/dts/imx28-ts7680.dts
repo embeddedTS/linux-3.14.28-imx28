@@ -23,7 +23,6 @@
 		mmc0 = &ssp0;
 		mmc2 = &ssp1;
 		i2c0 = &i2c0;
-		i2c1 = &i2c1_gpio;
 	};
 
 	memory {
@@ -75,30 +74,8 @@
 				#size-cells = <0>;
 				compatible = "fsl,imx28-spi";
 				pinctrl-names = "default";
-				pinctrl-0 = <&spi3_pins_b>;
-				status = "okay";
-
-				touch: tsc2046@0 {
-					compatible = "ti,tsc2046";
-					reg = <0>;
-					interrupt-parent = <&gpio0>;
-					interrupts = <6 2>;
-					spi-max-frequency = <2000000>;
-					pendown-gpio = <&gpio0 6 0>;
-					ti,penirq-recheck-delay-usecs = /bits/ 16 <5000>;
-					ti,vref-mv = <3300>;
-					ti,swap-xy;
-					ti,keep-vref-on;
-					ti,settle-delay-usec = /bits/ 16 <5000>;
-					ti,vref-delay-usecs = /bits/ 16 <0>;
-					ti,x-plate-ohms = /bits/ 16 <715>;
-					ti,y-plate-ohms = /bits/ 16 <325>;
-					ti,debounce-rep = /bits/ 16 <3>;
-					ti,debounce-tol = /bits/ 16 <65535>;
-					ti,debounce-max = /bits/ 16 <0>;
-					ti,pendown-gpio-debounce = <100000>;
-					linux,wakeup;
-				};
+				pinctrl-0 = <&spi3_pins_a>;
+				status = "disabled";
 			};
 			
 			
@@ -114,31 +91,15 @@
 					fsl,pull-up = <MXS_PULL_DISABLE>;				   
 				};
 
-				/* XXX: some of these are in GPIO mode still */
-				spi3_pins_b: ts7695touchpins {
-					reg = <0>;
-					fsl,pinmux-ids = <
-						MX28_PAD_GPMI_RDN__SSP3_SCK
-						MX28_PAD_GPMI_RESETN__SSP3_CMD
-						MX28_PAD_GPMI_CE0N__SSP3_D0
-						MX28_PAD_GPMI_CE1N__SSP3_D3
-						MX28_PAD_GPMI_ALE__SSP3_D1
-						MX28_PAD_GPMI_CLE__SSP3_D2
-					>;
-					fsl,drive-strength = <MXS_DRIVE_8mA>;
-					fsl,voltage = <MXS_VOLTAGE_HIGH>;
-					fsl,pull-up = <MXS_PULL_DISABLE>;
-				};
-
 				mmc0_4bit_pins_ts7680: mmc0-4bit@0 {
 					reg = <0>;
 					fsl,pinmux-ids = <
-						MX28_PAD_SSP0_DATA0__SSP0_D0
-						MX28_PAD_SSP0_DATA1__SSP0_D1
-						MX28_PAD_SSP0_DATA2__SSP0_D2
-						MX28_PAD_SSP0_DATA3__SSP0_D3
-						MX28_PAD_SSP0_CMD__SSP0_CMD						
-						MX28_PAD_SSP0_SCK__SSP0_SCK
+					  MX28_PAD_SSP0_DATA0__SSP0_D0
+					  MX28_PAD_SSP0_DATA1__SSP0_D1
+					  MX28_PAD_SSP0_DATA2__SSP0_D2
+					  MX28_PAD_SSP0_DATA3__SSP0_D3
+					  MX28_PAD_SSP0_CMD__SSP0_CMD						
+					  MX28_PAD_SSP0_SCK__SSP0_SCK
 					>;
 					fsl,drive-strength = <MXS_DRIVE_8mA>;
 					fsl,voltage = <MXS_VOLTAGE_HIGH>;
@@ -148,13 +109,13 @@
 				mmc1_4bit_pins: mmc1-4bit@0 {
 					reg = <0>;
 					fsl,pinmux-ids = <
-						MX28_PAD_GPMI_WRN__SSP1_SCK
+					  MX28_PAD_GPMI_WRN__SSP1_SCK
 
-						MX28_PAD_GPMI_RDY1__SSP1_CMD
-						MX28_PAD_GPMI_D00__SSP1_D0
-						MX28_PAD_GPMI_D01__SSP1_D1
-						MX28_PAD_GPMI_D02__SSP1_D2
-						MX28_PAD_GPMI_D03__SSP1_D3
+					  MX28_PAD_GPMI_RDY1__SSP1_CMD
+					  MX28_PAD_GPMI_D00__SSP1_D0
+					  MX28_PAD_GPMI_D01__SSP1_D1
+					  MX28_PAD_GPMI_D02__SSP1_D2
+					  MX28_PAD_GPMI_D03__SSP1_D3
 					>;
 					fsl,drive-strength = <MXS_DRIVE_8mA>;
 					fsl,voltage = <MXS_VOLTAGE_HIGH>;
@@ -164,13 +125,13 @@
 				mmc2_4bit_pins: mmc2-4bit@0 {   /* wifi */
 					reg = <0>;
 					fsl,pinmux-ids = <
-						MX28_PAD_SSP0_DATA4__SSP2_D0
-						MX28_PAD_SSP2_SS1__SSP2_D1
-						MX28_PAD_SSP2_SS2__SSP2_D2
-						MX28_PAD_SSP0_DATA5__SSP2_D3
-						MX28_PAD_SSP0_DATA6__SSP2_CMD
-						MX28_PAD_SSP0_DATA7__SSP2_SCK						
-						MX28_PAD_LCD_D22__GPIO_1_22
+					  MX28_PAD_SSP0_DATA4__SSP2_D0
+					  MX28_PAD_SSP2_SS1__SSP2_D1
+					  MX28_PAD_SSP2_SS2__SSP2_D2
+					  MX28_PAD_SSP0_DATA5__SSP2_D3
+					  MX28_PAD_SSP0_DATA6__SSP2_CMD
+					  MX28_PAD_SSP0_DATA7__SSP2_SCK						
+					  MX28_PAD_LCD_D22__GPIO_1_22
 					>;
 					fsl,drive-strength = <MXS_DRIVE_8mA>;
 					fsl,voltage = <MXS_VOLTAGE_LOW>;
@@ -179,12 +140,12 @@
 
 				mmc_sck_cfg: mmc-sck-cfg {
 					fsl,pinmux-ids = <
-						MX28_PAD_SSP0_DATA7__SSP2_SCK
+					  MX28_PAD_SSP0_DATA7__SSP2_SCK
 					>;
 					fsl,drive-strength = <MXS_DRIVE_12mA>;
 					fsl,pull-up = <MXS_PULL_DISABLE>;
 				};
-				
+
 				mac0_pins_ts7680: mac0@0 {
 					reg = <0>;
 					fsl,pinmux-ids = <
@@ -197,67 +158,57 @@
 					   MX28_PAD_ENET0_TXD0__ENET0_TXD0
 					   MX28_PAD_ENET0_TXD1__ENET0_TXD1
 					   MX28_PAD_ENET_CLK__CLKCTRL_ENET
-					   //MX28_PAD_SSP0_DETECT__GPIO_2_9   // ETH_RESET#
 					>;
 					fsl,drive-strength = <MXS_DRIVE_8mA>;
 					fsl,voltage = <MXS_VOLTAGE_HIGH>;
 					fsl,pull-up = <MXS_PULL_ENABLE>;
 				};
 
-			  i2c1_gpio_pins: i2c1_gpio_pins@0 {			  
-			     fsl,pinmux-ids = <
-				      MX28_PAD_AUART0_RTS__GPIO_3_3   // E2_I2C_CLK
-				      MX28_PAD_AUART0_CTS__GPIO_3_2   // E2_I2C_DAT
-				   >;
-				   fsl,drive-strength = <MXS_DRIVE_4mA>;
-					fsl,voltage = <MXS_VOLTAGE_HIGH>;
-					fsl,pull-up = <MXS_PULL_ENABLE>;				  
-			  };				
-			  
-			  
-			  spi_boot_pins_auart2: spi-boot-pins-auart2@0 {
-			      reg = <0>;
+				spi_boot_pins_auart2: spi-boot-pins-auart2@0 {
+					reg = <0>;
 					fsl,pinmux-ids = <
-						MX28_PAD_SSP2_SCK__AUART2_RX
-						MX28_PAD_SSP2_MOSI__AUART2_TX
+					  MX28_PAD_SSP2_SCK__AUART2_RX
+					  MX28_PAD_SSP2_MOSI__AUART2_TX
 					>;
 					fsl,drive-strength = <MXS_DRIVE_4mA>;
 					fsl,voltage = <MXS_VOLTAGE_HIGH>;
 					fsl,pull-up = <MXS_PULL_DISABLE>;
-			  };
+				};
 
-			  spi_boot_pins_auart3: spi-boot-pins-auart3@0 {
-			      reg = <0>;
+				spi_boot_pins_auart3: spi-boot-pins-auart3@0 {
+					reg = <0>;
 					fsl,pinmux-ids = <
-						MX28_PAD_SSP2_MISO__AUART3_RX
-						MX28_PAD_SSP2_SS0__AUART3_TX
+					  MX28_PAD_SSP2_MISO__AUART3_RX
+					  MX28_PAD_SSP2_SS0__AUART3_TX
 					>;
 					fsl,drive-strength = <MXS_DRIVE_4mA>;
 					fsl,voltage = <MXS_VOLTAGE_HIGH>;
 					fsl,pull-up = <MXS_PULL_DISABLE>;
-			  };
+				};
 
-			  auart4_pins: auart4@0 {
-			      reg = <0>;
+				auart4_pins: auart4@0 {
+					reg = <0>;
 					fsl,pinmux-ids = <
-						MX28_PAD_SAIF0_BITCLK__AUART4_RX
-						MX28_PAD_SAIF0_SDATA0__AUART4_TX
-						>;
+					  MX28_PAD_SAIF0_BITCLK__AUART4_RX
+					  MX28_PAD_SAIF0_SDATA0__AUART4_TX
+					>;
 					fsl,drive-strength = <MXS_DRIVE_4mA>;
 					fsl,voltage = <MXS_VOLTAGE_HIGH>;
 					fsl,pull-up = <MXS_PULL_DISABLE>;
-			  };
-			  misc_pins: misc@0 {
-			      reg = <0>;
-			      fsl,pinmux-ids = <
-				MX28_PAD_LCD_CS__GPIO_1_27 //USB 5V EN
-				MX28_PAD_LCD_RESET__GPIO_3_30 //EN_CAN#
-			      >;
-			      fsl,drive-strength = <MXS_DRIVE_4mA>;
-			      fsl,voltage = <MXS_VOLTAGE_HIGH>;
-			      fsl,pull-up = <MXS_PULL_ENABLE>;
-			  };
+				};
 
+				misc_pins: misc@0 {
+					reg = <0>;
+					fsl,pinmux-ids = <
+					  //USB 5V EN
+					  MX28_PAD_LCD_CS__GPIO_1_27
+					  //EN_CAN#
+					  MX28_PAD_LCD_RESET__GPIO_3_30
+			      		>;
+					fsl,drive-strength = <MXS_DRIVE_4mA>;
+					fsl,voltage = <MXS_VOLTAGE_HIGH>;
+					fsl,pull-up = <MXS_PULL_ENABLE>;
+				};
 			};
 			
 			can0: can@80032000 {
@@ -313,25 +264,8 @@
 					compatible = "ts-wdt";
 					reg = <0x78>;
 				};
-		   };
+		   	};
 
-			i2c1_gpio: i2c1_gpio@0 {
-			   compatible = "i2c-gpio";
-			   gpios = <&gpio3 2 0       // E2_I2C_DAT
-			         &gpio3 3 0          // E2_I2C_CLK
-			      >;
-			   i2c-gpio,sda-open-drain;
-			   i2c-gpio,scl-open-drain;
-			   i2c-gpio,delay-us = <2>;	/* ~100 kHz */
-			   i2c-gpio,timeout-ms = <500>; 
-			   #address-cells = <1>;
-			   #size-cells = <0>;			   
-			   pinctrl-names = "default";
-			   pinctrl-0 = <&i2c1_gpio_pins>;
-			   status = "disabled";
-				
-			};
-			
 			duart: serial@80074000 {
 				pinctrl-names = "default";
 				pinctrl-0 = <&duart_pins_a>;
@@ -410,10 +344,10 @@
 			phy-reset-duration = <1000>;
 			status = "okay";
 
-	      phy: ethernet@0 {	   
-	         device_type = "network";	         				         	    
-	         fixed-link = <0 1 100 0 0>;
-	         };
+			phy: ethernet@0 {	   
+				device_type = "network";
+				fixed-link = <0 1 100 0 0>;
+			};
 		};
 	};
 
@@ -494,7 +428,7 @@
 		compatible = "fsl,imx28-pinctrl";
 		pinctrl-names = "default";
 		pinctrl-0 = <
-			&misc_pins
+		  &misc_pins
 		>;
 	};
 };
