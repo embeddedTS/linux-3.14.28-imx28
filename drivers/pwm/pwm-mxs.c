@@ -161,11 +161,9 @@ static int mxs_pwm_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, mxs);
 
-/*
 	ret = stmp_reset_block(mxs->base);
 	if (ret)
 		goto pwm_remove;
-*/
 	return 0;
 
 pwm_remove:
