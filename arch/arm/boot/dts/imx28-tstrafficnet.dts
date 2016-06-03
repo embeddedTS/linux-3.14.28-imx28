@@ -59,8 +59,8 @@
 				max-frequency = <26000000>;
 				pinctrl-names = "default";
 				pinctrl-0 = <&mmc2_4bit_pins
-				            &mmc_sck_cfg>;
-				broken-cd = <1>;				
+		  			     &misc_pins>;
+				broken-cd = <1>;
 				cap-sdio-irq;
 				non-removable;
 				bus-width = <4>;
@@ -119,20 +119,15 @@
 					  MX28_PAD_SSP2_SS2__SSP2_D2
 					  MX28_PAD_SSP0_DATA5__SSP2_D3
 					  MX28_PAD_SSP0_DATA6__SSP2_CMD
-					  MX28_PAD_SSP0_DATA7__SSP2_SCK						
-					  MX28_PAD_LCD_D22__GPIO_1_22
-					>;
-					fsl,drive-strength = <MXS_DRIVE_8mA>;
-					fsl,voltage = <MXS_VOLTAGE_LOW>;
-					fsl,pull-up = <MXS_PULL_ENABLE>;
-				};
-
-				mmc_sck_cfg: mmc-sck-cfg {
-					fsl,pinmux-ids = <
 					  MX28_PAD_SSP0_DATA7__SSP2_SCK
+
+					  MX28_PAD_LCD_D23__GPIO_1_23 /* BT */
+					  MX28_PAD_LCD_D22__GPIO_1_22 /* IRQ */
+					  MX28_PAD_LCD_D21__GPIO_1_21 /* WL */
 					>;
 					fsl,drive-strength = <MXS_DRIVE_12mA>;
-					fsl,pull-up = <MXS_PULL_DISABLE>;
+					fsl,voltage = <MXS_VOLTAGE_LOW>;
+					fsl,pull-up = <MXS_PULL_ENABLE>;
 				};
 
 				mac0_pins_ts: mac0@0 {
@@ -182,11 +177,17 @@
 					fsl,pinmux-ids = <
 					  //USB 5V EN
 					  MX28_PAD_LCD_CS__GPIO_1_27
+
+					  MX28_PAD_SSP2_MISO__GPIO_2_18
+					  MX28_PAD_SSP2_SS0__GPIO_2_19
+					  MX28_PAD_SSP2_SCK__GPIO_2_16
+					  MX28_PAD_SSP2_MOSI__GPIO_2_17
 			      		>;
 					fsl,drive-strength = <MXS_DRIVE_4mA>;
 					fsl,voltage = <MXS_VOLTAGE_HIGH>;
 					fsl,pull-up = <MXS_PULL_ENABLE>;
 				};
+
 			};
 			
 			can0: can@80032000 {
@@ -365,13 +366,6 @@
 		status = "okay";
 	};
 
-	gpio_setup {
-		compatible = "fsl,imx28-pinctrl";
-		pinctrl-names = "default";
-		pinctrl-0 = <
-		  &misc_pins
-		>;
-	};
 };
 
 
