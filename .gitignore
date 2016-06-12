@@ -74,6 +74,9 @@ GRTAGS
 GSYMS
 GTAGS
 
+# build files that don't get cleaned
+imx28_ivt_linux.spi
+
 *.orig
 *~
 \#*#
