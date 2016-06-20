@@ -264,6 +264,17 @@
 					compatible = "ts-wdt";
 					reg = <0x78>;
 				};
+
+				accel: mma8451@1c {
+					compatible = "fsl,mma8451";
+					reg = <0x1c>;
+					position = <0>;
+					vdd-supply = <&reg_3p3v>;
+					vddio-supply = <&reg_3p3v>;
+					interrupt-parent = <&gpio0>;
+					interrupts = <20 6>;
+					interrupt-route = <1>;
+				};
 		   	};
 
 			duart: serial@80074000 {
