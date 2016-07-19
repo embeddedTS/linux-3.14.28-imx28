@@ -46,8 +46,7 @@
 			ssp2: ssp@80014000 {
 				compatible = "fsl,imx28-mmc";
 				pinctrl-names = "default";
-				pinctrl-0 = <&mmc2_4bit_pins_ts
-					     &en_sd_pwr>;
+				pinctrl-0 = <&mmc2_4bit_pins_ts>;
 				broken-cd = <1>;	     
 				bus-width = <4>;
 				vmmc-supply = <&reg_vddio_sd0>;
@@ -86,11 +85,16 @@
 					reg = <0>;
 					fsl,pinmux-ids = <
 						MX28_PAD_SSP0_DATA4__SSP2_D0
-						MX28_PAD_SSP1_SCK__SSP2_D1
-						MX28_PAD_SSP1_CMD__SSP2_D2
+						MX28_PAD_SSP2_SS1__SSP2_D1
+						MX28_PAD_SSP2_SS2__SSP2_D2
 						MX28_PAD_SSP0_DATA5__SSP2_D3
 						MX28_PAD_SSP0_DATA6__SSP2_CMD
 						MX28_PAD_SSP0_DATA7__SSP2_SCK
+
+						MX28_PAD_SSP2_SCK__GPIO_2_16
+						MX28_PAD_SSP2_MOSI__GPIO_2_17
+						MX28_PAD_SSP2_MISO__GPIO_2_18
+						MX28_PAD_SSP2_SS0__GPIO_2_19
 					>;
 					fsl,drive-strength = <MXS_DRIVE_8mA>;
 					fsl,voltage = <MXS_VOLTAGE_HIGH>;
