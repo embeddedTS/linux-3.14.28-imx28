@@ -381,7 +381,8 @@ fec_enet_start_xmit(struct sk_buff *skb, struct net_device *ndev)
 #ifdef CONFIG_MARVELL_SWITCH_WORKAROUND_FEC
 	{
 		unsigned short *usp = (unsigned short *)skb->data;
-		if (usp[6] == 0x0081 && skb->len > 60 && skb->len < 64) {
+		if(unlikely(usp[6] == 0x0081 && skb->len < 64 &&
+		  skb->len > 60)) {
 			if(bufaddr != fep->tx_bounce[index]) {
 				memcpy(fep->tx_bounce[index], skb->data,
 				  skb->len);
