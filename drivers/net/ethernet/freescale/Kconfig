@@ -31,6 +31,20 @@ config FEC
 	  Say Y here if you want to use the built-in 10/100 Fast ethernet
 	  controller on some Motorola ColdFire and Freescale i.MX processors.
 
+config MARVELL_SWITCH_WORKAROUND_FEC
+   bool "Marvell 88E6020/6070/6071 Workaround"
+   depends on FEC && VLAN_8021Q
+   help
+      The Marvell 88E6020/6070/6071 switch chip appears to
+      have a bug when stripping vlan-tagged packets out of the chip.
+      It seems that when the stripped size is between 61 and 63 bytes,
+      the chip is meant to pad the packets back to the 64-byte minimum,
+      but doesn't do so. This workaround adds some padding bytes to the
+      ethernet packet to make sure that when the chip strips the vlan tag,
+      the size of the packet doesn't dip below 64 bytes.
+
+      See fec_main.c for details.
+
 config FEC_MPC52xx
 	tristate "FEC MPC52xx driver"
 	depends on PPC_MPC52xx && PPC_BESTCOMM

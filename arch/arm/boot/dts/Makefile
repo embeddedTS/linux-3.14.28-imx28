@@ -189,8 +189,10 @@ dtb-$(CONFIG_ARCH_MXS) += imx23-evk.dtb \
 	imx28-sps1.dtb \
 	imx28-tx28.dtb \
 	imx28-ts7680.dtb \
+	imx28-ts7682.dtb \
 	imx28-ts7553.dtb \
 	imx28-tstrafficnet.dtb \
+	imx28-tsngmini.dtb \
 	imx28-tssage.dtb \
 	imx28-ts7690.dtb
 dtb-$(CONFIG_ARCH_NOMADIK) += ste-nomadik-s8815.dtb
