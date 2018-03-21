@@ -351,7 +351,7 @@
 			clocks = <&clks 57>, <&clks 57>, <&clks 64>;
 			clock-names = "ipg", "ahb", "enet_out";
 		 	phy-supply = <&phy_dummy_vbus>;		
-			phy-reset-gpios = <&gpio8 43 GPIO_ACTIVE_LOW>;
+			/*phy-reset-gpios = <&gpio8 43 GPIO_ACTIVE_LOW>;*/
 			phy-reset-duration = <1000>;
 			status = "okay";
 
