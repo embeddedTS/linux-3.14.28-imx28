@@ -1556,6 +1556,18 @@ config SENSORS_MC13783_ADC
         help
           Support for the A/D converter on MC13783 and MC13892 PMIC.
 
+config MXC_MMA8451
+	tristate "MMA8451 device driver"
+	depends on I2C
+	select INPUT_POLLDEV
+	help
+	  Say Y here if you want to support Freescale's MMA8451 Accelerometer
+	  through I2C interface.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called mma8451.
+
+
 if ACPI
 
 comment "ACPI drivers"

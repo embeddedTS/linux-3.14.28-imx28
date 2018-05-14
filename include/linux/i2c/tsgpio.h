@@ -7,6 +7,8 @@
 #define TSGPIO_ID      0x0004
 
 struct tsgpio_platform_data {
+	u16 ngpio;
+	int base;
 	int twobit;
 	u64 bank;
 };

@@ -51,6 +51,7 @@
 #include <video/of_display_timing.h>
 #include <video/of_videomode.h>
 #include <video/videomode.h>
+#include <linux/console.h>
 
 #define REG_SET	4
 #define REG_CLR	8
@@ -934,6 +935,11 @@ static void mxsfb_shutdown(struct platform_device *pdev)
 {
 	struct fb_info *fb_info = platform_get_drvdata(pdev);
 	struct mxsfb_info *host = to_imxfb_host(fb_info);
+
+	/* Blank display before shutting down */
+	console_lock();
+	fb_blank(fb_info, FB_BLANK_POWERDOWN);
+	console_unlock();
 
 	/*
 	 * Force stop the LCD controller as keeping it running during reboot

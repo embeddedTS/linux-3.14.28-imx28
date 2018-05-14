@@ -365,6 +365,40 @@ fec_enet_start_xmit(struct sk_buff *skb, struct net_device *ndev)
 		bufaddr = fep->tx_bounce[index];
 	}
 
+	/* The Marvell switch does not properly pad short VLAN frames.
+	 * Because of this, we need to find any VLAN tagged packets that are
+	 * between 60 and 64 bytes and 0 pad them to 64 bytes.
+	 *
+	 * To be safe, we use the bounce buffers AFTER they are already set
+	 * up above to be aligned, if they are set up.  If not, start using the
+	 * bounce buffer.  The bounce buffers are all 2kbyte in len.
+	 * This means we can copy over the skb data if its not already copied,
+	 * add 0s on the end of that to the length of 64, and then update the
+	 * skb->len and bdp->cbd_datlen variables.  This ends up with a safe,
+	 * 0 padded, 64 byte minimum VLAN frame that the switch is able to
+	 * correctly pass on.
+	 */
+#ifdef CONFIG_MARVELL_SWITCH_WORKAROUND_FEC
+	{
+		unsigned short *usp = (unsigned short *)skb->data;
+		if(unlikely(usp[6] == 0x0081 && skb->len < 64 &&
+		  skb->len > 60)) {
+			if(bufaddr != fep->tx_bounce[index]) {
+				memcpy(fep->tx_bounce[index], skb->data,
+				  skb->len);
+				bufaddr = fep->tx_bounce[index];
+				memset((fep->tx_bounce[index] + skb->len), 0x0,
+				  (64 - skb->len));
+			}
+			memset((fep->tx_bounce[index] + skb->len), 0x0,
+			  (64 - skb->len));
+			skb->len += (64 - skb->len);
+			bdp->cbd_datlen = skb->len;
+
+		}
+       }
+#endif
+
 	/*
 	 * Some design made an incorrect assumption on endian mode of
 	 * the system that it's running on. As the result, driver has to
