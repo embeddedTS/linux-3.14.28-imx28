@@ -95,14 +95,17 @@ static inline int gpio_ts_read(struct i2c_client *client, u16 addr)
 static int ts_set_gpio_input(struct i2c_client *client,
 	int gpio)
 {
+	u8 reg;
 	dev_dbg(&client->dev, "%s setting gpio %d to input\n",
 		__func__,
 		gpio);
 
-	/* This will clear the data enable, the other bits are
-	 * dontcare when this is cleared
+	/* Only set the OE bit here, requires a RMW. Prevents potential issue
+	 * with OE and data getting to the physical pin at different times.
 	 */
-	gpio_ts_write(client, gpio, 0);
+	reg = gpio_ts_read(client, gpio);
+	reg &= 0x2;
+	gpio_ts_write(client, gpio, reg);
 
 	return 0;
 }
@@ -177,8 +180,18 @@ static void ts_set(struct gpio_chip *chip, unsigned offset, int value)
 static int ts_direction_out(struct gpio_chip *chip, unsigned offset, int value)
 {
 	struct gpio_ts_priv *priv = to_gpio_ts(chip);
+	u8 oldvalue;
 
 	mutex_lock(&priv->mutex);
+	/* If changing from an input to an output, we need to first set the
+	 * proper data bit to what is requested and then set OE bit. This
+	 * prevents a glitch that can occur on the IO line
+	 */
+	oldvalue = gpio_ts_read(priv->client, offset);
+	if (!(oldvalue & 0x1)) {
+		oldvalue = ((value & 0x1) << 1);
+		gpio_ts_write(priv->client, offset, oldvalue);
+	}
 	ts_set_gpio_dataout(priv->client, offset, value);
 	mutex_unlock(&priv->mutex);
 
