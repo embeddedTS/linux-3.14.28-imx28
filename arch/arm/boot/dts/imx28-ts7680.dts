@@ -442,6 +442,24 @@
 		  &misc_pins
 		>;
 	};
+
+	spi2 {
+		compatible = "spi-gpio";
+		status = "okay";
+		gpio-sck = <&gpio2 16 0>;
+		gpio-mosi = <&gpio2 17 0>;
+		gpio-miso = <&gpio2 18 0>;
+		cs-gpios = <&gpio2 19 0>;
+		num-chipselects = <1>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		spi@0 {
+			compatible = "spidev";
+			reg = <0>;
+			spi-max-frequency = <1000000>;
+		};
+	};
 };
 
 
