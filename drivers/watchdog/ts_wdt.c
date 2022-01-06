@@ -148,7 +148,7 @@ static void ts_wdt_ping_work(struct work_struct *work)
 static struct watchdog_info ts_wdt_ident = {
 	.options	= WDIOF_SETTIMEOUT | WDIOF_KEEPALIVEPING | 
 				WDIOF_MAGICCLOSE,
-	.identity	= "Technologic Micro Watchdog",
+	.identity	= "embeddedTS Micro Watchdog",
 };
 
 static struct watchdog_ops ts_wdt_ops = {
@@ -224,6 +224,6 @@ static void __exit ts_reboot_exit(void)
 }
 module_exit(ts_reboot_exit);
 
-MODULE_AUTHOR("Mark Featherston <mark@embeddedarm.com>");
-MODULE_DESCRIPTION("Technologic Systems watchdog driver");
+MODULE_AUTHOR("Mark Featherston <mark@embeddedTS.com>");
+MODULE_DESCRIPTION("embeddedTS watchdog driver");
 MODULE_LICENSE("GPL");

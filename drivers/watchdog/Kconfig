@@ -349,18 +349,18 @@ config NUC900_WATCHDOG
 	  module will be called nuc900_wdt.
 
 config TS_WDT_MICRO
-	tristate "Technologic Microcontroller Watchdog"
+	tristate "embeddedTS Microcontroller Watchdog"
 	depends on ARM
 	select WATCHDOG_CORE
 	help
-	  Hardware driver for the Technologic Systems silabs based 
+	  Hardware driver for the embeddedTS silabs based 
 	  microcontroller watchdog
 
 config TS72XX_WATCHDOG
 	tristate "TS-72XX SBC Watchdog"
 	depends on MACH_TS72XX
 	help
-	  Technologic Systems TS-7200, TS-7250 and TS-7260 boards have
+	  embeddedTS TS-7200, TS-7250 and TS-7260 boards have
 	  watchdog timer implemented in a external CPLD chip. Say Y here
 	  if you want to support for the watchdog timer on TS-72XX boards.
 
