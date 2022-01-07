@@ -1,12 +1,12 @@
 #
-# Driver for the Technologic Systems M0 uC on the TS-7680 board
+# Driver for the embeddedTS M0 uC on the TS-7680 board
 #
-menu "Technologic Systems TS-7680 M0 Driver"
+menu "embeddedTS TS-7680 M0 Driver"
 config TS_M0
 	tristate "TS-7680 M0 Driver"
 	depends on SOC_IMX28 && I2C
 	help
 	  This option enables the driver for the M0 uC on the
-	  Technologic Systems TS-7680 board.
+	  embeddedTS TS-7680 board.
 
 endmenu
