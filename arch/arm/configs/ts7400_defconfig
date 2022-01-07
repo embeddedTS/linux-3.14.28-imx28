@@ -1176,7 +1176,7 @@ CONFIG_BLK_DEV_RAM_SIZE=4096
 #
 
 #
-# Technologic Systems TS-7680 M0 Driver
+# embeddedTS TS-7680 M0 Driver
 #
 # CONFIG_TS_M0 is not set
 

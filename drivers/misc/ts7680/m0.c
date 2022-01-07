@@ -1,7 +1,7 @@
 /*
  * m0.c -- driver for the M0 uC on the TS-7680 board
  *
- * Copyright (C) 2015 Technologic Systems
+ * Copyright (C) 2015-2022 Technologic Systems, Inc. dba embeddedTS
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -68,6 +68,6 @@ static struct i2c_driver m0_driver = {
 module_i2c_driver(m0_driver);
 
 MODULE_DESCRIPTION("Driver for m0 on TS-7680");
-MODULE_AUTHOR("Technologic Systems");
+MODULE_AUTHOR("embeddedTS");
 MODULE_LICENSE("GPL");
 MODULE_ALIAS("i2c:m0");
