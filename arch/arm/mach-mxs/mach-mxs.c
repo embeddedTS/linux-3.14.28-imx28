@@ -547,7 +547,7 @@ static const char *mxs_dt_compat[] __initdata = {
 	NULL,
 };
 
-DT_MACHINE_START(MXS, "Technologic Systems TS-7600/TS-4600")
+DT_MACHINE_START(MXS, "embeddedTS TS-7600/TS-4600")
 	.handle_irq	= icoll_handle_irq,
 	.init_machine	= mxs_machine_init,
 	.init_late      = mxs_pm_init,
