@@ -16,7 +16,7 @@
 
 / {
 
-	model = "Technologic Systems i.MX28 TS-7690 (Default Device Tree)";
+	model = "embeddedTS i.MX28 TS-7690 (Default Device Tree)";
 	compatible = "fsl,imx28-ts7690", "fsl,imx28";
 
 	aliases {
